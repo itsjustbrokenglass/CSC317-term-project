@@ -1,1 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell a Bike | Bikes SF</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header (reuse from main) -->
+    <header class="nav-bar">
+
+        <div class="about-faq">
+            <p class="tagline">Your one stop shop for used and new bike products in San Francisco!</p>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#">FAQ</a></li>
+            </ul>
+        </div>
+
+        <div class="logo-search-cart-signin">
+            <h1>Bikes SF</h1>
+        </div>
+
+    </header>
+
+    <main class="sell-page">
+
+        <h1>Sell Your Bike</h1>
+        <p class="sell-subtitle">Fill out the form below to upload your product listing.</p>
+
+        <form class="sell-form">
+
+            <label>Bike Name</label>
+            <input type="text" placeholder="Ex: Trek FX 3 Disc" required>
+
+            <label>Location</label>
+            <input type="text" placeholder="San Francisco, CA" required>
+
+            <label>Price</label>
+            <input type="number" placeholder="Ex: 450" required>
+
+            <label>Description</label>
+            <textarea placeholder="Describe the bike’s condition, features, etc." rows="5" required></textarea>
+
+            <label>Upload Photo</label>
+            <input type="file" accept="image/*" required>
+
+            <label>Item Condition</label>
+            <select required>
+                <option value="">Select Condition</option>
+                <option>New</option>
+                <option>Like New</option>
+                <option>Good</option>
+                <option>Fair</option>
+                <option>Needs Repair</option>
+            </select>
+
+            <button type="submit" class="submit-btn">Submit Listing</button>
+
+        </form>
+
+    </main>
+
+</body>
+
+</html>
