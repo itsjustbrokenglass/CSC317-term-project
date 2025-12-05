@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  main.sell-page
+    h1 Sell Your Bike or Gear
+    p.sell-subtitle Fill out the form below to upload your product listing. It will appear on the correct category page.
+
+    form.sell-form(action="/sell" method="POST")
+      label Item Name
+      input(type="text" name="name" placeholder="Ex: Trek FX 3 Disc" required)
+
+      label Location
+      input(type="text" name="location" placeholder="San Francisco, CA" required)
+
+      label Price (USD)
+      input(type="number" name="price" placeholder="Ex: 450" required)
+
+      label Description
+      textarea(name="description" rows="5" required placeholder="Describe the item’s condition, features, etc.")
+
+      label Image URL
+      input(type="url" name="imageUrl" placeholder="https://example.com/your-bike.jpg")
+
+      label Category
+      select(name="category" required)
+        option(value="") Select Category
+        option(value="bikes") Bikes
+        option(value="helmets") Helmets
+        option(value="accessories") Accessories
+        option(value="parts") Parts
+        option(value="other") Other
+
+      label Item Condition
+      select(name="condition" required)
+        option(value="") Select Condition
+        option(value="New") New
+        option(value="Like New") Like New
+        option(value="Good") Good
+        option(value="Fair") Fair
+        option(value="Needs Repair") Needs Repair
+
+      button.submit-btn(type="submit") Submit Listing
