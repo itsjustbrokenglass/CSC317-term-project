@@ -2,114 +2,115 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bikes SF</title>
-    <link href="style.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bikes SF</title>
+
+  <!-- google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="about-faq">
-            <p class="tagline">Your one stop shop for used and new bike products in San Francisco!</p>
-            <ul>
-                <li><a>About</a></li>
-                <li><a>FAQ</a></li>
+  <header class="nav-bar">
+    <div class="about-faq">
+      <p class="tagline">Your one stop shop for used and new bike products in San Francisco!</p>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+
+    <div class="logo-search-cart-signin">
+      <h1><a href="index.html" class="logo-link">Bikes SF</a></h1>
+      <input type="text" placeholder="Search bikes, parts, and more">
+      <ul class="icon-list">
+        <li><img src="search.png" alt="Search" class="icon"></li>
+        <li><img src="cart.png" alt="Cart" class="icon"></li>
+      </ul>
+    </div>
+
+    <nav class="product-options">
+      <ul class="nav-list">
+        <li><a href="buy.html">Bikes</a></li>
+        <li><a href="helmets.html">Helmets</a></li>
+        <li><a href="accessories.html">Accessories</a></li>
+        <li><a href="parts.html">Parts</a></li>
+        <li><a href="sell.html">Sell</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <img class="homepage" src="brown-road-bike-free-png.png" alt="brown-bicycle">
+
+  <div class="page-content">
+    <h1>Browse</h1>
+    <div class="buttons">
+      <button onclick="window.location.href='buy.html'">Buy</button>
+      <button onclick="window.location.href='sell.html'">Sell</button>
+    </div>
+  </div>
+
+  <div class="footer-parent">
+    <footer>
+      <div class="footer-main">
+        <div class="footer-brand">
+          <h1>Bikes SF</h1>
+        </div>
+
+        <div class="learn-more">
+          <h2>Sell With Us</h2>
+          <p>Content about selling used parts with our website.</p>
+          <a href="sell.html" class="learn-more-link">Learn More →</a>
+        </div>
+
+        <div class="footer-links">
+          <div class="footer-column">
+            <h3>Resources</h3>
+            <ul class="footer-list">
+              <li>Climate Data</li>
+              <li>Research Papers</li>
+              <li>Educational Tools</li>
+              <li>News & Updates</li>
+              <li>FAQ</li>
             </ul>
-        </div>
-        <div class="logo-search-cart-signin">
-            <h1>Bikes SF</h1>
-            <input type="text" placeholder="Search">
-            <ul>
-                <li><a>Search Logo</a></li>
-                <li><a>Cart Button</a></li>
+          </div>
+
+          <div class="footer-column">
+            <h3>Get Involved</h3>
+            <ul class="footer-list">
+              <li>Volunteer</li>
+              <li>Donate</li>
+              <li>Partnerships</li>
+              <li>Events</li>
+              <li>Community</li>
             </ul>
+          </div>
 
-
-        </div>
-        <div class="product-options">
-            <ul class="nav-list">
-                <li><a>Bikes</a></li>
-                <li><a>Helmets</a></li>
-                <li><a>Accessories</a></li>
-                <li><a>Parts</a></li>
-                <li><a href="sell.html">Sell</a></li>
+          <div class="footer-column">
+            <h3>Legal</h3>
+            <ul class="footer-list">
+              <li>Terms & Conditions</li>
+              <li>Privacy Policy</li>
+              <li>Cookie Policy</li>
+              <li>Accessibility</li>
+              <li>Careers</li>
             </ul>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <img class="homepage" src="brown-road-bike-free-png.png" alt="brown-bicycle">
-
-    <div class="page-content">
-        <h1>Browse</h1>
-        <div class="buttons">
-            <button>Buy</button>
-            <button onclick="window.location.href='sell.html'">Sell</button>
-
-        </div>
-    </div>
-
-
-    <div class="footer">
-    </div>
-
-    <div class="footer-parent">
-        <footer>
-            <div class="footer-main">
-                <div class="footer-brand">
-
-                    <h1>Bikes SF</h1>
-                </div>
-
-                <div class="learn-more">
-                    <h2>Sell With Us</h2>
-                    <p>Content about selling used parts with our websites</p>
-                    <a href="#" class="learn-more-link">Learn More →</a>
-                </div>
-
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h3>Resources</h3>
-                        <ul class="footer-list">
-                            <li>Climate Data</li>
-                            <li>Research Papers</li>
-                            <li>Educational Tools</li>
-                            <li>News & Updates</li>
-                            <li>FAQ</li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-column">
-                        <h3>Get Involved</h3>
-                        <ul class="footer-list">
-                            <li>Volunteer</li>
-                            <li>Donate</li>
-                            <li>Partnerships</li>
-                            <li>Events</li>
-                            <li>Community</li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-column">
-                        <h3>Legal</h3>
-                        <ul class="footer-list">
-                            <li>Terms & Conditions</li>
-                            <li>Privacy Policy</li>
-                            <li>Cookie Policy</li>
-                            <li>Accessibility</li>
-                            <li>Careers</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>© 2025 Bikes SF. All rights reserved. | Your one stop shop for ysed and new bike products in San
-                    Francisco.</p>
-            </div>
-        </footer>
-    </div>
-
+      <div class="footer-bottom">
+        <p>© 2025 Bikes SF. All rights reserved. | Your one stop shop for used and new bike products in San
+          Francisco.</p>
+      </div>
+    </footer>
+  </div>
 </body>
 
 </html>
