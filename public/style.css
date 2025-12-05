@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: "Josefin Sans", sans-serif;
-  background-color: #f7efe7;
+  background-color: #f7efe7; /* soft beige background */
   color: #222;
   line-height: 1.5;
 }
@@ -17,12 +17,7 @@ ul {
   list-style: none;
 }
 
-/* header */
-.nav-bar {
-  background-color: #f7efe7;
-}
-
-/* top bar */
+/* top */
 .about-faq {
   background-color: rgb(207, 240, 157);
   display: flex;
@@ -56,7 +51,7 @@ ul {
   gap: 20px;
 }
 
-.logo-search-cart-signin input {
+input {
   width: 40%;
   padding: 10px 14px;
   border-radius: 8px;
@@ -250,32 +245,33 @@ footer {
 
 /* icons */
 .icon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  cursor: pointer;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    cursor: pointer;
 }
 
 .icon:hover {
-  opacity: 0.7;
-  transform: scale(1.1);
-  transition: 0.2s;
+    opacity: 0.7;
+    transform: scale(1.1);
+    transition: 0.2s;
 }
 
+
 .icon-list {
-  display: flex;
-  gap: 18px;
-  align-items: center;
+    display: flex;
+    gap: 18px;
+    align-items: center;
 }
 
 .logo-link {
-  text-decoration: none;
-  color: inherit;
+    text-decoration: none;
+    color: inherit;
 }
 
 .logo-link:hover {
-  opacity: 0.7;
-  transition: 0.2s;
+    opacity: 0.7;
+    transition: 0.2s;
 }
 
 /* catagory pages */
@@ -352,4 +348,179 @@ footer {
 .product-btn:hover {
   background-color: #222;
   color: white;
+}
+
+
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #f7efe7;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+.about-faq {
+  align-items: center;
+  font-size: 13px;
+}
+
+.logo-search-cart-signin {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-search-cart-signin h1 {
+  letter-spacing: 0.05em;
+}
+
+.logo-search-cart-signin input {
+  background-color: #fdf7ef;
+  border-color: #c4b9ae;
+  transition: border 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.logo-search-cart-signin input:focus {
+  outline: none;
+  background-color: #fff;
+  border-color: #222;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* hover underline on nav links */
+.product-options .nav-list a {
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.product-options .nav-list a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #222;
+  transition: width 0.18s ease;
+}
+
+.product-options .nav-list a:hover::after {
+  width: 100%;
+}
+
+/* image a bit smaller + shadowed */
+.homepage {
+  max-width: 420px;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.18));
+}
+
+.page-content .buttons button:first-child {
+  background-color: #222;
+  color: #fff;
+}
+
+.page-content .buttons button:first-child:hover {
+  background-color: #000;
+}
+
+.page-content .buttons button:last-child {
+  background-color: transparent;
+}
+
+.page-content .buttons button:last-child:hover {
+  background-color: #222;
+  color: #fff;
+}
+
+/* hover glow on category pages */
+.product-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* price pop a bit more */
+.product-price {
+  color: #15803d;
+  font-weight: 700;
+}
+
+/* spacing tweak on inside cards */
+.product-description {
+  font-size: 14px;
+  color: #666;
+}
+
+/* tweaks on sell page */
+.sell-page {
+  background: transparent;
+}
+
+.sell-form {
+  background-color: #fff;
+  border-radius: 18px;
+  padding: 24px 22px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Inputs a bit softer */
+.sell-form input,
+.sell-form textarea,
+.sell-form select {
+  background-color: #fdf7ef;
+}
+
+.sell-form input:focus,
+.sell-form textarea:focus,
+.sell-form select:focus {
+  outline: none;
+  background-color: #fff;
+  border-color: #222;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons consistent with rest of site */
+.submit-btn {
+  align-self: flex-start;
+}
+
+/* Footer darken slightly for more contrast */
+.footer-parent {
+  background: #f1e5d8;
+}
+
+/* ========== responsive tweaks ========== */
+@media (max-width: 768px) {
+  .logo-search-cart-signin {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .logo-search-cart-signin h1 {
+    text-align: center;
+  }
+
+  .logo-search-cart-signin input {
+    width: 100%;
+  }
+
+  .product-options .nav-list {
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 16px;
+  }
+
+  .homepage {
+    max-width: 320px;
+  }
+
+  .sell-page {
+    margin-top: 20px;
+  }
 }
