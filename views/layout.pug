@@ -1,1 +1,84 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title= pageTitle || 'Bikes SF'
+
+    // Google Fonts
+    link(rel="preconnect" href="https://fonts.googleapis.com")
+    link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+    link(
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    )
+
+    link(rel="stylesheet" href="/style.css")
+  body
+    header.nav-bar
+      .about-faq
+        p.tagline Your one stop shop for used and new bike products in San Francisco!
+        ul
+          li
+            a(href="/") Home
+          li
+            a(href="#") FAQ
+
+      .logo-search-cart-signin
+        h1
+          a.logo-link(href="/") Bikes SF
+        input#search(type="text" placeholder="Search bikes, parts, and more")
+        ul.icon-list
+          li
+            img.icon(src="/search.png" alt="Search")
+          li
+            img.icon(src="/cart.png" alt="Cart")
+
+      nav.product-options
+        ul.nav-list
+          li: a(href="/buy.html") Bikes
+          li: a(href="/helmets.html") Helmets
+          li: a(href="/accessories.html") Accessories
+          li: a(href="/parts.html") Parts
+          li: a(href="/sell.html") Sell
+
+    block content
+
+    .footer-parent
+      footer
+        .footer-main
+          .footer-brand
+            h1 Bikes SF
+          .learn-more
+            h2 Sell With Us
+            p Content about selling used parts with our website.
+            a.learn-more-link(href="/sell.html") Learn More →
+          .footer-links
+            .footer-column
+              h3 Resources
+              ul.footer-list
+                li Climate Data
+                li Research Papers
+                li Educational Tools
+                li News & Updates
+                li FAQ
+            .footer-column
+              h3 Get Involved
+              ul.footer-list
+                li Volunteer
+                li Donate
+                li Partnerships
+                li Events
+                li Community
+            .footer-column
+              h3 Legal
+              ul.footer-list
+                li Terms & Conditions
+                li Privacy Policy
+                li Cookie Policy
+                li Accessibility
+                li Careers
+
+        .footer-bottom
+          p © 2025 Bikes SF. All rights reserved. | Your one stop shop for used and new bike products in San Francisco.
 
