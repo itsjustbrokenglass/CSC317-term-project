@@ -1,1 +1,19 @@
+extends layout
 
+block content
+  main.buy-page
+    h1= heading
+    p.buy-subtitle= subtitle
+
+    if listings && listings.length
+      section.product-grid
+        each listing in listings
+          article.product-card
+            img(src=listing.imageUrl || '/brown-road-bike-free-png.png', alt=listing.name)
+            h2= listing.name
+            p.product-price `$${listing.price}`
+            p.product-location= listing.location
+            p.product-condition `Condition: ${listing.condition}`
+            p.product-description= listing.description
+    else
+      p No items listed yet. Be the first to sell!
