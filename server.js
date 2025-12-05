@@ -10,16 +10,30 @@ const {
 const app = express();
 const PORT = 3000;
 
-// Middleware
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true }));
+// pug
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
-// Home
+app.use(express.static(path.join(__dirname, 'public'))); // CSS & images
+app.use(express.urlencoded({ extended: true }));         // form POST
+
+// ----- routes ----- //
+
+// Home page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.render('index', {
+    pageTitle: 'Bikes SF'
+  });
 });
 
-// Handle Sell form (writes to DB through db.js)
+// sell get
+app.get('/sell.html', (req, res) => {
+  res.render('sell', {
+    pageTitle: 'Sell a Bike | Bikes SF'
+  });
+});
+
+// sell post
 app.post('/sell', (req, res) => {
   const { name, location, price, description, imageUrl, category, condition } = req.body;
 
@@ -29,13 +43,13 @@ app.post('/sell', (req, res) => {
 
   createListing(
     { name, location, price, description, imageUrl, category, condition },
-    (err, id) => {
+    (err) => {
       if (err) {
         console.error('Error inserting listing:', err);
         return res.status(500).send('Error saving your listing.');
       }
 
-      // Redirect based on category
+      // Redirect based on category, keeping same URLs as before
       switch (category) {
         case 'bikes':
           return res.redirect('/buy.html');
@@ -52,21 +66,56 @@ app.post('/sell', (req, res) => {
   );
 });
 
-// API route (reads from DB through db.js)
-app.get('/api/listings/:category', (req, res) => {
-  const { category } = req.params;
-
-  getListingsByCategory(category, (err, rows) => {
-    if (err) {
-      console.error('Error fetching listings:', err);
-      return res.status(500).json({ error: 'Failed to load listings.' });
-    }
-
-    res.json(rows);
+// Category pages rendered with Pug, pulling from DB
+app.get('/buy.html', (req, res) => {
+  getListingsByCategory('bikes', (err, listings) => {
+    if (err) return res.status(500).send('Error loading bikes.');
+    res.render('category', {
+      pageTitle: 'Buy a Bike | Bikes SF',
+      heading: 'Browse Bikes',
+      subtitle: 'Explore used and new bikes available in the Bay Area.',
+      listings
+    });
   });
 });
 
-// Start server
+app.get('/helmets.html', (req, res) => {
+  getListingsByCategory('helmets', (err, listings) => {
+    if (err) return res.status(500).send('Error loading helmets.');
+    res.render('category', {
+      pageTitle: 'Helmets | Bikes SF',
+      heading: 'Helmets',
+      subtitle: 'Browse high-quality helmets for every ride.',
+      listings
+    });
+  });
+});
+
+app.get('/accessories.html', (req, res) => {
+  getListingsByCategory('accessories', (err, listings) => {
+    if (err) return res.status(500).send('Error loading accessories.');
+    res.render('category', {
+      pageTitle: 'Accessories | Bikes SF',
+      heading: 'Accessories',
+      subtitle: 'Lights, locks, tools, and more.',
+      listings
+    });
+  });
+});
+
+app.get('/parts.html', (req, res) => {
+  getListingsByCategory('parts', (err, listings) => {
+    if (err) return res.status(500).send('Error loading parts.');
+    res.render('category', {
+      pageTitle: 'Parts | Bikes SF',
+      heading: 'Parts',
+      subtitle: 'Replacement parts for repairs and upgrades.',
+      listings
+    });
+  });
+});
+
+// server start
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Using SQLite database at: ${dbPath}`);
