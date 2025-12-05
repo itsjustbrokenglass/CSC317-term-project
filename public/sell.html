@@ -2,75 +2,95 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell a Bike | Bikes SF</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sell a Bike | Bikes SF</title>
 
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <header class="nav-bar">
+    <div class="about-faq">
+      <p class="tagline">Your one stop shop for used and new bike products in San Francisco!</p>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
 
-    <!-- Header (reuse from main) -->
-    <header class="nav-bar">
+    <div class="logo-search-cart-signin">
+      <h1><a href="index.html" class="logo-link">Bikes SF</a></h1>
+      <ul class="icon-list">
+        <li><img src="search.png" alt="Search" class="icon"></li>
+        <li><img src="cart.png" alt="Cart" class="icon"></li>
+      </ul>
+    </div>
 
-        <div class="about-faq">
-            <p class="tagline">Your one stop shop for used and new bike products in San Francisco!</p>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#">FAQ</a></li>
-            </ul>
-        </div>
+    <nav class="product-options">
+      <ul class="nav-list">
+        <li><a href="buy.html">Bikes</a></li>
+        <li><a href="helmets.html">Helmets</a></li>
+        <li><a href="accessories.html">Accessories</a></li>
+        <li><a href="parts.html">Parts</a></li>
+        <li><a href="sell.html">Sell</a></li>
+      </ul>
+    </nav>
+  </header>
 
-        <div class="logo-search-cart-signin">
-            <h1>Bikes SF</h1>
-        </div>
+  <main class="sell-page">
+    <h1>Sell Your Bike or Gear</h1>
+    <p class="sell-subtitle">Fill out the form below to upload your product listing. It will appear on the correct
+      category page.</p>
 
-    </header>
+    <!-- POSTS TO /sell WHICH SAVES INTO SQLITE DB -->
+    <form class="sell-form" action="/sell" method="POST">
+      <label>Item Name</label>
+      <input type="text" name="name" placeholder="Ex: Trek FX 3 Disc" required>
 
-    <main class="sell-page">
+      <label>Location</label>
+      <input type="text" name="location" placeholder="San Francisco, CA" required>
 
-        <h1>Sell Your Bike</h1>
-        <p class="sell-subtitle">Fill out the form below to upload your product listing.</p>
+      <label>Price (USD)</label>
+      <input type="number" name="price" placeholder="Ex: 450" required>
 
-        <form class="sell-form">
+      <label>Description</label>
+      <textarea name="description" rows="5"
+        placeholder="Describe the item’s condition, features, etc." required></textarea>
 
-            <label>Bike Name</label>
-            <input type="text" placeholder="Ex: Trek FX 3 Disc" required>
+      <label>Image URL</label>
+      <input type="url" name="imageUrl" placeholder="https://example.com/your-bike.jpg">
 
-            <label>Location</label>
-            <input type="text" placeholder="San Francisco, CA" required>
+      <label>Category</label>
+      <select name="category" required>
+        <option value="">Select Category</option>
+        <option value="bikes">Bikes</option>
+        <option value="helmets">Helmets</option>
+        <option value="accessories">Accessories</option>
+        <option value="parts">Parts</option>
+        <option value="other">Other</option>
+      </select>
 
-            <label>Price</label>
-            <input type="number" placeholder="Ex: 450" required>
+      <label>Item Condition</label>
+      <select name="condition" required>
+        <option value="">Select Condition</option>
+        <option value="New">New</option>
+        <option value="Like New">Like New</option>
+        <option value="Good">Good</option>
+        <option value="Fair">Fair</option>
+        <option value="Needs Repair">Needs Repair</option>
+      </select>
 
-            <label>Description</label>
-            <textarea placeholder="Describe the bike’s condition, features, etc." rows="5" required></textarea>
-
-            <label>Upload Photo</label>
-            <input type="file" accept="image/*" required>
-
-            <label>Item Condition</label>
-            <select required>
-                <option value="">Select Condition</option>
-                <option>New</option>
-                <option>Like New</option>
-                <option>Good</option>
-                <option>Fair</option>
-                <option>Needs Repair</option>
-            </select>
-
-            <button type="submit" class="submit-btn">Submit Listing</button>
-
-        </form>
-
-    </main>
-
+      <button type="submit" class="submit-btn">Submit Listing</button>
+    </form>
+  </main>
 </body>
 
 </html>
