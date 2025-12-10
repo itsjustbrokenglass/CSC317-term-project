@@ -1,0 +1,333 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title= pageTitle || 'Sign In | Bikes SF'
+    link(rel="preconnect" href="https://fonts.googleapis.com")
+    link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+    link(
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    )
+    style.
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: "Josefin Sans", sans-serif;
+        background-color: #f7efe7;
+        color: #222;
+        line-height: 1.5;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      a { text-decoration: none; color: #222; }
+      .simple-header {
+        padding: 20px 30px;
+        display: flex;
+        justify-content: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background: #f7efe7;
+      }
+      .simple-header h1 {
+        font-weight: 600;
+        font-size: 36px;
+        letter-spacing: 0.05em;
+      }
+      .auth-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .auth-card {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        width: 100%;
+        max-width: 480px;
+        overflow: hidden;
+      }
+      .auth-tabs {
+        display: flex;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .auth-tab {
+        flex: 1;
+        padding: 20px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #f9fafb;
+        color: #888;
+        transition: all 0.2s ease;
+        border: none;
+        font-family: "Josefin Sans", sans-serif;
+      }
+      .auth-tab.active {
+        background: white;
+        color: #222;
+        border-bottom: 3px solid #222;
+      }
+      .auth-tab:hover { color: #222; }
+      .auth-content { padding: 40px; }
+      .auth-form { display: none; }
+      .auth-form.active { display: block; }
+      .form-group { margin-bottom: 24px; }
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #222;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 8px;
+        border: 1px solid #c4b9ae;
+        font-size: 16px;
+        font-family: "Josefin Sans", sans-serif;
+        background-color: #fdf7ef;
+        transition: all 0.15s ease;
+      }
+      .form-group input:focus {
+        outline: none;
+        background-color: #fff;
+        border-color: #222;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+      }
+      .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        font-size: 14px;
+      }
+      .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .remember-me input[type="checkbox"] {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+      }
+      .forgot-password {
+        color: #c17a3a;
+        font-weight: 600;
+        transition: opacity 0.2s;
+      }
+      .forgot-password:hover { opacity: 0.7; }
+      .submit-btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: 10px;
+        border: none;
+        background-color: #222;
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        font-family: "Josefin Sans", sans-serif;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 20px;
+      }
+      .submit-btn:hover {
+        background-color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 24px 0;
+        color: #888;
+        font-size: 14px;
+      }
+      .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .divider span { padding: 0 12px; }
+      .social-login {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 10px;
+        border: 2px solid #e5e5e5;
+        background: white;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: "Josefin Sans", sans-serif;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: #222;
+      }
+      .social-btn:hover {
+        border-color: #222;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .social-icon { font-size: 20px; }
+      .terms-text {
+        font-size: 13px;
+        color: #888;
+        text-align: center;
+        margin-top: 20px;
+        line-height: 1.6;
+      }
+      .terms-text a {
+        color: #c17a3a;
+        font-weight: 600;
+      }
+      .terms-text a:hover { text-decoration: underline; }
+      .welcome-message {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .welcome-message h2 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .welcome-message p {
+        color: #666;
+        font-size: 15px;
+      }
+      .error-message {
+        background: #fee;
+        border: 1px solid #fcc;
+        color: #c33;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      @media (max-width: 640px) {
+        .auth-content { padding: 24px; }
+        .simple-header h1 { font-size: 28px; }
+        .auth-tab {
+          font-size: 18px;
+          padding: 16px;
+        }
+      }
+      
+  body
+    header.simple-header
+      h1
+        a(href="/") Bikes SF
+
+    .auth-container
+      .auth-card
+        .auth-tabs
+          button.auth-tab.active(onclick="switchTab('login')") Sign In
+          button.auth-tab(onclick="switchTab('signup')") Sign Up
+
+        .auth-content
+          if error
+            .error-message= error
+
+          form.auth-form.active(id="login-form" action="/auth/login" method="POST")
+            .welcome-message
+              h2 Welcome Back!
+              p Sign in to continue buying and selling bikes
+
+            .form-group
+              label(for="login-email") Email
+              input(type="email" id="login-email" name="email" placeholder="you@example.com" required)
+
+            .form-group
+              label(for="login-password") Password
+              input(type="password" id="login-password" name="password" placeholder="••••••••" required)
+
+            .form-options
+              label.remember-me
+                input(type="checkbox" name="remember")
+                span Remember me
+              a.forgot-password(href="#") Forgot password?
+
+            button.submit-btn(type="submit") Sign In
+
+            .divider
+              span or continue with
+
+            .social-login
+              a.social-btn(href="/auth/google")
+                span.social-icon 🔍
+                span Continue with Google
+              a.social-btn(href="/auth/facebook")
+                span.social-icon 📘
+                span Continue with Facebook
+
+          form.auth-form(id="signup-form" action="/auth/signup" method="POST")
+            .welcome-message
+              h2 Create Account
+              p Join our community of bike enthusiasts
+
+            .form-group
+              label(for="signup-name") Full Name
+              input(type="text" id="signup-name" name="name" placeholder="John Doe" required)
+
+            .form-group
+              label(for="signup-email") Email
+              input(type="email" id="signup-email" name="email" placeholder="you@example.com" required)
+
+            .form-group
+              label(for="signup-password") Password
+              input(type="password" id="signup-password" name="password" placeholder="••••••••" required)
+
+            .form-group
+              label(for="signup-confirm") Confirm Password
+              input(type="password" id="signup-confirm" name="confirmPassword" placeholder="••••••••" required)
+
+            button.submit-btn(type="submit") Create Account
+
+            .divider
+              span or sign up with
+
+            .social-login
+              a.social-btn(href="/auth/google")
+                span.social-icon 🔍
+                span Sign up with Google
+              a.social-btn(href="/auth/facebook")
+                span.social-icon 📘
+                span Sign up with Facebook
+
+            p.terms-text
+              | By creating an account, you agree to our 
+              a(href="#") Terms of Service
+              |  and 
+              a(href="#") Privacy Policy
+
+    script.
+      function switchTab(tab) {
+        const tabs = document.querySelectorAll('.auth-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        const forms = document.querySelectorAll('.auth-form');
+        forms.forEach(f => f.classList.remove('active'));
+        
+        if (tab === 'login') {
+          tabs[0].classList.add('active');
+          document.getElementById('login-form').classList.add('active');
+        } else {
+          tabs[1].classList.add('active');
+          document.getElementById('signup-form').classList.add('active');
+        }
+      }
