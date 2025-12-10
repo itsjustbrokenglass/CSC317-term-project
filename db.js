@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const dbPath = path.join(__dirname, 'bikessf.db');
 const db = new sqlite3.Database(dbPath);
 
+
 // table
 db.serialize(() => {
   db.run(`
@@ -56,9 +57,28 @@ function getListingsByCategory(category, callback) {
   db.all(sql, [category], callback);
 }
 
+// Get single listing by ID
+function getListingById(id, callback) {
+  const sql = `
+    SELECT id, name, location, price, description, imageUrl, category, condition, createdAt
+    FROM listings
+    WHERE id = ?
+  `;
+  
+  db.get(sql, [id], callback);
+}
+
+
 module.exports = {
   db,
   dbPath,
   createListing,
-  getListingsByCategory
+  getListingsByCategory,
+  getListingById 
 };
+
+
+
+
+
+
