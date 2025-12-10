@@ -1,0 +1,302 @@
+extends layout
+
+block content
+  main.product-detail-page
+    .product-container
+      .product-gallery
+        .main-image
+          img(src=listing.imageUrl || '/brown-road-bike-free-png.png', alt=listing.name)
+        
+      .product-info
+        .product-header
+          h1.product-title= listing.name
+          .product-meta-top
+            span.product-location 📍 #{listing.location}
+            span.product-condition-badge= listing.condition
+        
+        .product-price-section
+          p.product-price $#{listing.price.toFixed(2)}
+        
+        .product-actions
+          button.btn-add-cart Add to Cart
+          button.btn-contact-seller Contact Seller
+        
+        .product-details-section
+          h2 About This Item
+          p.product-description= listing.description
+          
+          .product-specs
+            .spec-item
+              span.spec-label Category:
+              span.spec-value= listing.category.charAt(0).toUpperCase() + listing.category.slice(1)
+            .spec-item
+              span.spec-label Condition:
+              span.spec-value= listing.condition
+            .spec-item
+              span.spec-label Listed:
+              span.spec-value= new Date(listing.createdAt).toLocaleDateString()
+        
+        .seller-section
+          h3 Seller Information
+          .seller-card
+            .seller-avatar 👤
+            .seller-details
+              p.seller-name Local SF Seller
+              p.seller-rating ⭐ 4.8 (24 reviews)
+              p.seller-response Usually responds within 24 hours
+  
+  style.
+    .product-detail-page {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .product-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      background: #fff;
+      padding: 40px;
+      border-radius: 18px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .product-gallery {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+    
+    .main-image {
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fdf7ef;
+      padding: 30px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    
+    .main-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    .product-info {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .product-header {
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 20px;
+    }
+    
+    .product-title {
+      font-size: 36px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: #222;
+    }
+    
+    .product-meta-top {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .product-location {
+      font-size: 16px;
+      color: #666;
+    }
+    
+    .product-condition-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .product-price-section {
+      padding: 16px 0;
+    }
+    
+    .product-price {
+      font-size: 42px;
+      font-weight: 700;
+      color: #15803d;
+      margin: 0;
+    }
+    
+    .product-actions {
+      display: flex;
+      gap: 12px;
+      padding: 20px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .btn-add-cart,
+    .btn-contact-seller {
+      flex: 1;
+      padding: 16px 24px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-family: "Josefin Sans", sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    
+    .btn-add-cart {
+      background-color: #222;
+      color: white;
+    }
+    
+    .btn-add-cart:hover {
+      background-color: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-contact-seller {
+      background: transparent;
+      color: #222;
+      border: 2px solid #222;
+    }
+    
+    .btn-contact-seller:hover {
+      background-color: #222;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .product-details-section h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+    }
+    
+    .product-description {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #444;
+      margin-bottom: 24px;
+    }
+    
+    .product-specs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fdf7ef;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    
+    .spec-item {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .spec-label {
+      font-weight: 600;
+      color: #222;
+      min-width: 100px;
+    }
+    
+    .spec-value {
+      color: #555;
+    }
+    
+    .seller-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e5;
+    }
+    
+    .seller-section h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+    }
+    
+    .seller-card {
+      display: flex;
+      gap: 16px;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+    }
+    
+    .seller-avatar {
+      font-size: 48px;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border-radius: 50%;
+      border: 2px solid #e5e5e5;
+    }
+    
+    .seller-details {
+      flex: 1;
+    }
+    
+    .seller-name {
+      font-weight: 600;
+      font-size: 18px;
+      margin: 0 0 6px 0;
+      color: #222;
+    }
+    
+    .seller-rating {
+      font-size: 14px;
+      margin: 0 0 6px 0;
+      color: #666;
+    }
+    
+    .seller-response {
+      font-size: 13px;
+      margin: 0;
+      color: #888;
+    }
+    
+    @media (max-width: 968px) {
+      .product-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 24px;
+      }
+      
+      .product-gallery {
+        position: static;
+      }
+      
+      .product-title {
+        font-size: 28px;
+      }
+      
+      .product-price {
+        font-size: 36px;
+      }
+      
+      .product-actions {
+        flex-direction: column;
+      }
+      
+      .btn-add-cart,
+      .btn-contact-seller {
+        width: 100%;
+      }
+    }
