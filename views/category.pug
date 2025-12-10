@@ -9,11 +9,15 @@ block content
       section.product-grid
         each listing in listings
           article.product-card
-            img(src=listing.imageUrl || '/brown-road-bike-free-png.png', alt=listing.name)
-            h2= listing.name
-            p.product-price `$${listing.price}`
-            p.product-location= listing.location
-            p.product-condition `Condition: ${listing.condition}`
-            p.product-description= listing.description
+            a(href=`/product/${listing.id}`)
+              img(src=listing.imageUrl || '/brown-road-bike-free-png.png', alt=listing.name)
+            h2
+              a(href=`/product/${listing.id}`)= listing.name
+            p.product-price= `$${listing.price}`
+            p.product-condition= `Condition: ${listing.condition}`
+            p.product-location= "Within 5 Miles of: " + listing.location
+            
+      
+                                    
     else
       p No items listed yet. Be the first to sell!
