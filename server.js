@@ -4,7 +4,8 @@ const path = require('path');
 const {
   dbPath,
   createListing,
-  getListingsByCategory
+  getListingsByCategory,
+  getListingById
 } = require('./db');
 
 const app = express();
@@ -114,6 +115,28 @@ app.get('/parts.html', (req, res) => {
     });
   });
 });
+
+
+app.get('/product/:id', (req, res) => {
+  const productId = req.params.id;
+  
+  getListingById(productId, (err, listing) => {
+    if (err) {
+      console.error('Error loading product:', err);
+      return res.status(500).send('Error loading product.');
+    }
+    
+    if (!listing) {
+      return res.status(404).send('Product not found.');
+    }
+    
+    res.render('product', {
+      pageTitle: `${listing.name} | Bikes SF`,
+      listing
+    });
+  });
+});
+
 
 // server start
 app.listen(PORT, () => {
