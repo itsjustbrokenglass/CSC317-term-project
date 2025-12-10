@@ -27,12 +27,20 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/profile', (req, res) => {
+  res.render('profile', {
+    pageTitle: 'Log in/Sign Up | Bikes SF'
+  });
+});
+
 // sell get
 app.get('/sell.html', (req, res) => {
   res.render('sell', {
     pageTitle: 'Sell a Bike | Bikes SF'
   });
 });
+
+
 
 // sell post
 app.post('/sell', (req, res) => {
