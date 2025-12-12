@@ -1,4 +1,3 @@
-// db.js
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
@@ -7,6 +6,17 @@ const db = new sqlite3.Database(dbPath);
 
 // Create tables
 db.serialize(() => {
+  // Users table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      passwordHash TEXT NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Listings table
   db.run(`
     CREATE TABLE IF NOT EXISTS listings (
@@ -35,6 +45,29 @@ db.serialize(() => {
     )
   `);
 });
+
+// ===== USER FUNCTIONS =====
+
+function createUser({ name, email, passwordHash }, callback) {
+  const sql = `
+    INSERT INTO users (name, email, passwordHash)
+    VALUES (?, ?, ?)
+  `;
+  db.run(sql, [name, email, passwordHash], function (err) {
+    if (err) return callback(err);
+    callback(null, this.lastID);
+  });
+}
+
+function getUserByEmail(email, callback) {
+  const sql = `SELECT * FROM users WHERE email = ?`;
+  db.get(sql, [email], callback);
+}
+
+function getUserById(id, callback) {
+  const sql = `SELECT * FROM users WHERE id = ?`;
+  db.get(sql, [id], callback);
+}
 
 // ===== LISTING FUNCTIONS =====
 
@@ -161,9 +194,15 @@ function getCartCount(userId, callback) {
 module.exports = {
   db,
   dbPath,
+  // users
+  createUser,
+  getUserByEmail,
+  getUserById,
+  // listings
   createListing,
   getListingsByCategory,
   getListingById,
+  // cart
   addToCart,
   getCartItems,
   updateCartQuantity,
@@ -171,6 +210,7 @@ module.exports = {
   clearCart,
   getCartCount
 };
+
 
 
 
