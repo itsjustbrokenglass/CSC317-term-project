@@ -1,0 +1,384 @@
+extends layout
+
+block content
+  main.cart-page
+    h1 Shopping Cart
+    
+    if cartItems && cartItems.length > 0
+      .cart-container
+        .cart-items
+          each item in cartItems
+            .cart-item
+              .item-image
+                img(src=item.imageUrl || '/brown-road-bike-free-png.png', alt=item.name)
+              .item-details
+                h3= item.name
+                p.item-price $#{item.price.toFixed(2)}
+              .item-quantity
+                label Quantity:
+                input(
+                  type="number" 
+                  min="1" 
+                  value=item.quantity
+                  data-product-id=item.id
+                  onchange="updateQuantity(this)"
+                )
+              .item-subtotal
+                p $#{(item.price * item.quantity).toFixed(2)}
+              .item-remove
+                button.remove-btn(onclick=`removeItem(${item.id})`) ×
+        
+        .cart-summary
+          h2 Order Summary
+          .summary-row
+            span Subtotal:
+            span $#{total.toFixed(2)}
+          .summary-row
+            span Shipping:
+            span Free
+          .summary-row.total
+            span Total:
+            span.total-amount $#{total.toFixed(2)}
+          button.checkout-btn(onclick="checkout()") Proceed to Checkout
+          button.clear-cart-btn(onclick="clearCart()") Clear Cart
+    else
+      .empty-cart
+        p Your cart is empty
+        a.continue-shopping(href="/buy.html") Continue Shopping
+  
+  style.
+    .cart-page {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .cart-page h1 {
+      font-size: 42px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .cart-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+    }
+    
+    .cart-items {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .cart-item {
+      display: grid;
+      grid-template-columns: 120px 2fr 150px 120px 40px;
+      gap: 20px;
+      align-items: center;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .item-image img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .item-details h3 {
+      font-size: 18px;
+      margin: 0 0 8px 0;
+    }
+    
+    .item-price {
+      color: #15803d;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .item-quantity label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    
+    .item-quantity input {
+      width: 80px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #c4b9ae;
+      font-size: 16px;
+    }
+    
+    .item-subtotal p {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .item-remove {
+      text-align: center;
+    }
+    
+    .remove-btn {
+      background: transparent;
+      border: none;
+      font-size: 32px;
+      color: #666;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+    }
+    
+    .remove-btn:hover {
+      color: #dc2626;
+    }
+    
+    .cart-summary {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+    
+    .cart-summary h2 {
+      font-size: 24px;
+      margin: 0 0 20px 0;
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .summary-row.total {
+      border-bottom: none;
+      border-top: 2px solid #222;
+      margin-top: 12px;
+      padding-top: 16px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .total-amount {
+      color: #15803d;
+    }
+    
+    .checkout-btn,
+    .clear-cart-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 18px;
+      font-family: "Josefin Sans", sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .checkout-btn {
+      background-color: #222;
+      color: white;
+      margin-top: 20px;
+    }
+    
+    .checkout-btn:hover {
+      background-color: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .clear-cart-btn {
+      background: transparent;
+      color: #dc2626;
+      border: 2px solid #dc2626;
+      margin-top: 12px;
+    }
+    
+    .clear-cart-btn:hover {
+      background-color: #dc2626;
+      color: white;
+    }
+    
+    .empty-cart {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    
+    .empty-cart p {
+      font-size: 24px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    
+    .continue-shopping {
+      display: inline-block;
+      padding: 14px 28px;
+      background-color: #222;
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .continue-shopping:hover {
+      background-color: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (max-width: 968px) {
+      .cart-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .cart-item {
+        grid-template-columns: 80px 1fr;
+        gap: 16px;
+        padding: 16px;
+      }
+      
+      .item-image {
+        grid-row: 1 / 3;
+      }
+      
+      .item-details {
+        grid-column: 2;
+      }
+      
+      .item-quantity {
+        grid-column: 1 / -1;
+        margin-top: 12px;
+      }
+      
+      .item-quantity input {
+        width: 100%;
+      }
+      
+      .item-subtotal {
+        grid-column: 1 / -1;
+        text-align: right;
+        padding-top: 8px;
+        border-top: 1px solid #e5e5e5;
+      }
+      
+      .item-remove {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+      }
+      
+      .cart-item {
+        position: relative;
+      }
+      
+      .cart-summary {
+        position: static;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .cart-page h1 {
+        font-size: 32px;
+      }
+      
+      .cart-item {
+        grid-template-columns: 60px 1fr;
+        gap: 12px;
+      }
+      
+      .item-image img {
+        height: 60px;
+      }
+      
+      .item-details h3 {
+        font-size: 16px;
+      }
+      
+      .item-price {
+        font-size: 14px;
+      }
+      
+      .checkout-btn,
+      .clear-cart-btn {
+        padding: 14px;
+        font-size: 16px;
+      }
+    }
+  
+  script.
+    function updateQuantity(input) {
+      const productId = input.dataset.productId;
+      const quantity = parseInt(input.value);
+      
+      fetch('/cart/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId, quantity })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        }
+      })
+      .catch(err => console.error('Error updating cart:', err));
+    }
+    
+    function removeItem(productId) {
+      if (confirm('Remove this item from cart?')) {
+        fetch('/cart/remove', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ productId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          }
+        })
+        .catch(err => console.error('Error removing item:', err));
+      }
+    }
+    
+    function clearCart() {
+      if (confirm('Clear all items from cart?')) {
+        fetch('/cart/clear', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          }
+        })
+        .catch(err => console.error('Error clearing cart:', err));
+      }
+    }
+    
+    function checkout() {
+      alert('Checkout functionality coming soon!');
+    }
