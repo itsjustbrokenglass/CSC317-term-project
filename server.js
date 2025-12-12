@@ -5,22 +5,21 @@ const bcrypt = require('bcryptjs');
 const {
   dbPath,
   createUser,
-  getUserByEmail,
+  getUserByEmail,    
   getUserById,
   createListing,
   getListingsByCategory,
   getListingById,
   addToCart,
-  getCartItems, 
+  getCartItems,
   updateCartQuantity,
   removeFromCart,
   clearCart,
   getCartCount,
-  assignListingToSeller,       // <--- add this
-  createOrderFromCart,
-  getUserPurchaseHistory,
   getUserSellingHistory
 } = require('./db');
+
+
 
 
 
@@ -222,35 +221,37 @@ app.post('/sell', (req, res) => {
     return res.status(400).send('Missing required fields.');
   }
 
+  // If logged in, attach the user as seller; otherwise null
+  const sellerId = req.session.user ? req.session.user.id : null;
+
   createListing(
-    { name, location, price, description, imageUrl, category, condition },
+    { name, location, price, description, imageUrl, category, condition, sellerId },
     (err, listingId) => {
       if (err) {
         console.error('Error inserting listing:', err);
         return res.status(500).send('Error saving your listing.');
       }
 
-      const sellerId = req.session.user ? req.session.user.id : null;
-      assignListingToSeller(listingId, sellerId, (err2) => {
-        if (err2) console.error('Error linking listing to seller:', err2);
-
-        // existing redirect logic
-        switch (category) {
-          case 'bikes':
-            return res.redirect('/buy.html');
-          case 'helmets':
-            return res.redirect('/helmets.html');
-          case 'accessories':
-            return res.redirect('/accessories.html');
-          case 'parts':
-            return res.redirect('/parts.html');
-          default:
-            return res.redirect('/buy.html');
-        }
-      });
+      // redirect based on category as before
+      switch (category) {
+        case 'bikes':
+          return res.redirect('/buy.html');
+        case 'helmets':
+          return res.redirect('/helmets.html');
+        case 'accessories':
+          return res.redirect('/accessories.html');
+        case 'parts':
+          return res.redirect('/parts.html');
+        default:
+          return res.redirect('/buy.html');
+      }
     }
   );
 });
+
+
+
+
 
 
 // Category pages rendered with Pug, pulling from DB
@@ -451,9 +452,8 @@ app.post('/cart/clear', (req, res) => {
 // Profile route: login/signup if logged out, user profile if logged in
 app.get('/profile', (req, res) => {
   const error = req.query.error || null;
-  const orderSuccess = !!req.query.orderSuccess;
 
-  // Not logged in -> show auth page (your existing profile.pug)
+  // If NOT logged in -> show login / signup page
   if (!req.session.user) {
     return getCartCount(req.session.userId, (err, count) => {
       res.render('profile', {
@@ -464,37 +464,29 @@ app.get('/profile', (req, res) => {
     });
   }
 
-  // Logged in -> show user profile dashboard
+  // Logged in -> show user profile
   const user = req.session.user;
 
   getCartCount(req.session.userId, (err, cartCount) => {
     if (err) console.error(err);
 
-    // These two helpers we’ll add in db.js below
-    getUserPurchaseHistory(user.id, (err2, purchases) => {
+    getUserSellingHistory(user.id, (err2, sales) => {
       if (err2) {
         console.error(err2);
-        purchases = [];
+        sales = [];
       }
 
-      getUserSellingHistory(user.id, (err3, sales) => {
-        if (err3) {
-          console.error(err3);
-          sales = [];
-        }
-
-        res.render('user-profile', {
-          pageTitle: 'Your Profile | Bikes SF',
-          cartCount: cartCount || 0,
-          user,
-          purchases,
-          sales,
-          orderSuccess
-        });
+      res.render('user-profile', {
+        pageTitle: 'Your Profile | Bikes SF',
+        cartCount: cartCount || 0,
+        user,
+        purchases: [],  // hook up later
+        sales
       });
     });
   });
 });
+
 
 // Simple checkout route
 app.post('/checkout', (req, res) => {
