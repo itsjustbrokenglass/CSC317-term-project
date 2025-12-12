@@ -28,6 +28,7 @@ db.serialize(() => {
       imageUrl TEXT,
       category TEXT NOT NULL,
       condition TEXT NOT NULL,
+      sellerId INTEGER, -- who submitted the Sell form
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -108,19 +109,19 @@ function getUserById(id, callback) {
 
 // Create new listing
 function createListing(data, callback) {
-  const { name, location, price, description, imageUrl, category, condition } = data;
+  const { name, location, price, description, imageUrl, category, condition, sellerId } = data;
 
   const finalImageUrl =
     imageUrl && imageUrl.trim() !== '' ? imageUrl.trim() : 'brown-road-bike-free-png.png';
 
   const sql = `
-    INSERT INTO listings (name, location, price, description, imageUrl, category, condition)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO listings (name, location, price, description, imageUrl, category, condition, sellerId)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.run(
     sql,
-    [name, location, price, description, finalImageUrl, category, condition],
+    [name, location, price, description, finalImageUrl, category, condition, sellerId || null],
     function (err) {
       if (err) return callback(err);
       callback(null, this.lastID);
@@ -304,48 +305,46 @@ function getUserPurchaseHistory(userId, callback) {
   db.all(sql, [userId], callback);
 }
 
-// Get "what I sold/listed" for a user
+
+
 function getUserSellingHistory(userId, callback) {
   const sql = `
     SELECT 
-      l.id,
-      l.name,
-      l.price,
-      l.imageUrl,
-      l.createdAt
-    FROM listing_sellers ls
-    JOIN listings l ON ls.listingId = l.id
-    WHERE ls.sellerId = ?
-    ORDER BY l.createdAt DESC
+      id,
+      name,
+      price,
+      imageUrl,
+      category,
+      condition,
+      location,
+      createdAt
+    FROM listings
+    WHERE sellerId = ?
+    ORDER BY createdAt DESC
   `;
   db.all(sql, [userId], callback);
 }
 
 
+
 module.exports = {
   db,
   dbPath,
-  // user helpers (if you have them)
   createUser,
-  getUserByEmail,
+  getUserByEmail,     
   getUserById,
-  // listings
   createListing,
   getListingsByCategory,
   getListingById,
-  // cart
   addToCart,
   getCartItems,
   updateCartQuantity,
   removeFromCart,
   clearCart,
   getCartCount,
-  // new profile-related helpers
-  assignListingToSeller,
-  createOrderFromCart,
-  getUserPurchaseHistory,
   getUserSellingHistory
 };
+
 
 
 
