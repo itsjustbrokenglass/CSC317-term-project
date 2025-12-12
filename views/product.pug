@@ -18,8 +18,10 @@ block content
           p.product-price $#{listing.price.toFixed(2)}
         
         .product-actions
-          button.btn-add-cart Add to Cart
+          button.btn-add-cart(onclick=`addToCart(${listing.id})`) Add to Cart
           button.btn-contact-seller Contact Seller
+        
+        #cart-message.cart-message
         
         .product-details-section
           h2 About This Item
@@ -165,6 +167,12 @@ block content
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
     
+    .btn-add-cart:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
     .btn-contact-seller {
       background: transparent;
       color: #222;
@@ -176,6 +184,40 @@ block content
       color: white;
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .cart-message {
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+    
+    .cart-message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+      display: block;
+    }
+    
+    .cart-message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+      display: block;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .product-details-section h2 {
@@ -299,4 +341,95 @@ block content
       .btn-contact-seller {
         width: 100%;
       }
+    }
+    
+    @media (max-width: 640px) {
+      .product-container {
+        padding: 16px;
+      }
+      
+      .main-image {
+        padding: 20px;
+      }
+      
+      .product-title {
+        font-size: 24px;
+      }
+      
+      .product-price {
+        font-size: 32px;
+      }
+      
+      .product-meta-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .btn-add-cart,
+      .btn-contact-seller {
+        padding: 14px 20px;
+        font-size: 16px;
+      }
+      
+      .product-details-section h2 {
+        font-size: 20px;
+      }
+      
+      .seller-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .seller-avatar {
+        margin: 0 auto;
+      }
+    }
+  
+  script.
+    function addToCart(productId) {
+      const btn = document.querySelector('.btn-add-cart');
+      const message = document.getElementById('cart-message');
+      
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+      
+      fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          message.className = 'cart-message success';
+          message.textContent = '✓ Added to cart successfully!';
+          
+          // Update cart count in header if exists
+          const cartBadge = document.querySelector('.cart-count');
+          if (cartBadge) {
+            cartBadge.textContent = data.cartCount;
+          }
+          
+          setTimeout(() => {
+            message.style.display = 'none';
+          }, 3000);
+        } else {
+          message.className = 'cart-message error';
+          message.textContent = '✗ ' + (data.message || 'Failed to add to cart');
+        }
+        
+        btn.disabled = false;
+        btn.textContent = 'Add to Cart';
+      })
+      .catch(err => {
+        console.error('Error adding to cart:', err);
+        message.className = 'cart-message error';
+        message.textContent = '✗ Error adding to cart';
+        
+        btn.disabled = false;
+        btn.textContent = 'Add to Cart';
+      });
     }
