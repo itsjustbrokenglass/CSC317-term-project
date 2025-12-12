@@ -15,8 +15,13 @@ const {
   updateCartQuantity,
   removeFromCart,
   clearCart,
-  getCartCount
+  getCartCount,
+  assignListingToSeller,       // <--- add this
+  createOrderFromCart,
+  getUserPurchaseHistory,
+  getUserSellingHistory
 } = require('./db');
+
 
 const app = express();
 const PORT = 3000;
@@ -64,17 +69,35 @@ app.get('/', (req, res) => {
   });
 });
 
-// Profile (login/signup page)
 app.get('/profile', (req, res) => {
   const error = req.query.error || null;
+
+  // If NOT logged in -> show login / signup page
+  if (!req.session.user) {
+    return getCartCount(req.session.userId, (err, count) => {
+      res.render('profile', {
+        pageTitle: 'Log in/Sign Up | Bikes SF',
+        cartCount: count || 0,
+        error
+      });
+    });
+  }
+
+  // If logged in -> show user profile dashboard
+  const user = req.session.user;
+
   getCartCount(req.session.userId, (err, count) => {
-    res.render('profile', {
-      pageTitle: 'Log in/Sign Up | Bikes SF',
+    res.render('user-profile', {
+      pageTitle: 'Your Profile | Bikes SF',
       cartCount: count || 0,
-      error
+      user,
+      // if you haven't wired DB history yet, just send empty arrays:
+      purchases: [],
+      sales: []
     });
   });
 });
+
 
 // --- AUTH ROUTES ---
 
@@ -199,27 +222,34 @@ app.post('/sell', (req, res) => {
 
   createListing(
     { name, location, price, description, imageUrl, category, condition },
-    (err) => {
+    (err, listingId) => {
       if (err) {
         console.error('Error inserting listing:', err);
         return res.status(500).send('Error saving your listing.');
       }
 
-      switch (category) {
-        case 'bikes':
-          return res.redirect('/buy.html');
-        case 'helmets':
-          return res.redirect('/helmets.html');
-        case 'accessories':
-          return res.redirect('/accessories.html');
-        case 'parts':
-          return res.redirect('/parts.html');
-        default:
-          return res.redirect('/buy.html');
-      }
+      const sellerId = req.session.user ? req.session.user.id : null;
+      assignListingToSeller(listingId, sellerId, (err2) => {
+        if (err2) console.error('Error linking listing to seller:', err2);
+
+        // existing redirect logic
+        switch (category) {
+          case 'bikes':
+            return res.redirect('/buy.html');
+          case 'helmets':
+            return res.redirect('/helmets.html');
+          case 'accessories':
+            return res.redirect('/accessories.html');
+          case 'parts':
+            return res.redirect('/parts.html');
+          default:
+            return res.redirect('/buy.html');
+        }
+      });
     }
   );
 });
+
 
 // Category pages rendered with Pug, pulling from DB
 app.get('/buy.html', (req, res) => {
@@ -415,6 +445,77 @@ app.post('/cart/clear', (req, res) => {
     res.json({ success: true });
   });
 });
+
+// Profile route: login/signup if logged out, user profile if logged in
+app.get('/profile', (req, res) => {
+  const error = req.query.error || null;
+  const orderSuccess = !!req.query.orderSuccess;
+
+  // Not logged in -> show auth page (your existing profile.pug)
+  if (!req.session.user) {
+    return getCartCount(req.session.userId, (err, count) => {
+      res.render('profile', {
+        pageTitle: 'Log in/Sign Up | Bikes SF',
+        cartCount: count || 0,
+        error
+      });
+    });
+  }
+
+  // Logged in -> show user profile dashboard
+  const user = req.session.user;
+
+  getCartCount(req.session.userId, (err, cartCount) => {
+    if (err) console.error(err);
+
+    // These two helpers we’ll add in db.js below
+    getUserPurchaseHistory(user.id, (err2, purchases) => {
+      if (err2) {
+        console.error(err2);
+        purchases = [];
+      }
+
+      getUserSellingHistory(user.id, (err3, sales) => {
+        if (err3) {
+          console.error(err3);
+          sales = [];
+        }
+
+        res.render('user-profile', {
+          pageTitle: 'Your Profile | Bikes SF',
+          cartCount: cartCount || 0,
+          user,
+          purchases,
+          sales,
+          orderSuccess
+        });
+      });
+    });
+  });
+});
+
+// Simple checkout route
+app.post('/checkout', (req, res) => {
+  // Must be logged in to checkout
+  if (!req.session.user) {
+    return res.redirect('/profile?error=Please log in before checking out.');
+  }
+
+  const userId = req.session.user.id;
+  const cartUserId = req.session.userId;
+
+  createOrderFromCart(userId, cartUserId, (err, orderId) => {
+    if (err) {
+      console.error('Checkout error:', err);
+      return res.status(500).send('Error while checking out.');
+    }
+
+    // Redirect to profile with a little success flag
+    res.redirect('/profile?orderSuccess=1');
+  });
+});
+
+
 
 // server start
 app.listen(PORT, () => {
