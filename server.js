@@ -11,7 +11,7 @@ const {
   getListingsByCategory,
   getListingById,
   addToCart,
-  getCartItems,
+  getCartItems, 
   updateCartQuantity,
   removeFromCart,
   clearCart,
@@ -21,6 +21,8 @@ const {
   getUserPurchaseHistory,
   getUserSellingHistory
 } = require('./db');
+
+
 
 
 const app = express();
