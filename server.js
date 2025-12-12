@@ -1,9 +1,12 @@
-// server.js
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const bcrypt = require('bcryptjs');
 const {
   dbPath,
+  createUser,
+  getUserByEmail,
+  getUserById,
   createListing,
   getListingsByCategory,
   getListingById,
@@ -34,11 +37,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // For AJAX requests
 
-// Initialize session ID if needed
+// Initialize session ID for cart if needed
 app.use((req, res, next) => {
   if (!req.session.userId) {
+    // This userId is for the cart (anonymous or logged in)
     req.session.userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
+  next();
+});
+
+// Expose logged-in user to templates
+app.use((req, res, next) => {
+  res.locals.currentUser = req.session.user || null;
   next();
 });
 
@@ -54,14 +64,120 @@ app.get('/', (req, res) => {
   });
 });
 
+// Profile (login/signup page)
 app.get('/profile', (req, res) => {
+  const error = req.query.error || null;
   getCartCount(req.session.userId, (err, count) => {
     res.render('profile', {
       pageTitle: 'Log in/Sign Up | Bikes SF',
-      cartCount: count || 0
+      cartCount: count || 0,
+      error
     });
   });
 });
+
+// --- AUTH ROUTES ---
+
+// Sign up
+app.post('/auth/signup', (req, res) => {
+  const { name, email, password, confirmPassword } = req.body;
+
+  if (!name || !email || !password || !confirmPassword) {
+    return renderAuthError(req, res, 'Please fill in all fields.');
+  }
+
+  if (password !== confirmPassword) {
+    return renderAuthError(req, res, 'Passwords do not match.');
+  }
+
+  // Check if email already exists
+  getUserByEmail(email, (err, existingUser) => {
+    if (err) {
+      console.error('Error checking user by email:', err);
+      return renderAuthError(req, res, 'Something went wrong. Please try again.');
+    }
+
+    if (existingUser) {
+      return renderAuthError(req, res, 'An account with that email already exists.');
+    }
+
+    // Hash password and create user
+    bcrypt.hash(password, 10, (err, passwordHash) => {
+      if (err) {
+        console.error('Error hashing password:', err);
+        return renderAuthError(req, res, 'Something went wrong. Please try again.');
+      }
+
+      createUser({ name, email, passwordHash }, (err, userId) => {
+        if (err) {
+          console.error('Error creating user:', err);
+          return renderAuthError(req, res, 'Something went wrong. Please try again.');
+        }
+
+        // Log them in
+        req.session.user = { id: userId, name, email };
+        res.redirect('/');
+      });
+    });
+  });
+});
+
+// Login
+app.post('/auth/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return renderAuthError(req, res, 'Please enter both email and password.');
+  }
+
+  getUserByEmail(email, (err, user) => {
+    if (err) {
+      console.error('Error fetching user by email:', err);
+      return renderAuthError(req, res, 'Something went wrong. Please try again.');
+    }
+
+    if (!user) {
+      return renderAuthError(req, res, 'Invalid email or password.');
+    }
+
+    bcrypt.compare(password, user.passwordHash, (err, isMatch) => {
+      if (err) {
+        console.error('Error comparing password:', err);
+        return renderAuthError(req, res, 'Something went wrong. Please try again.');
+      }
+
+      if (!isMatch) {
+        return renderAuthError(req, res, 'Invalid email or password.');
+      }
+
+      // Success: store user info in session
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      };
+
+      res.redirect('/');
+    });
+  });
+});
+
+// Logout
+app.post('/auth/logout', (req, res) => {
+  req.session.user = null; // keep cart session if you like
+  res.redirect('/');
+});
+
+// Helper: render profile page with error
+function renderAuthError(req, res, message) {
+  getCartCount(req.session.userId, (err, count) => {
+    res.status(400).render('profile', {
+      pageTitle: 'Log in/Sign Up | Bikes SF',
+      cartCount: count || 0,
+      error: message
+    });
+  });
+}
 
 // sell get
 app.get('/sell.html', (req, res) => {
