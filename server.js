@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const {
   dbPath,
   createUser,
-  getUserByEmail,    
+  getUserByEmail,
   getUserById,
   createListing,
   getListingsByCategory,
@@ -16,12 +16,9 @@ const {
   removeFromCart,
   clearCart,
   getCartCount,
-  getUserSellingHistory
+  getUserPurchaseHistory,    // if you have it
+  getUserSellingHistory      // <-- this must be here
 } = require('./db');
-
-
-
-
 
 
 const app = express();
@@ -71,33 +68,54 @@ app.get('/', (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
+  console.log('GET /profile, session.user =', req.session.user);
+
   const error = req.query.error || null;
 
-  // If NOT logged in -> show login / signup page
+  // Not logged in -> show login/signup page
   if (!req.session.user) {
     return getCartCount(req.session.userId, (err, count) => {
-      res.render('profile', {
+      if (err) {
+        console.error('getCartCount error (logged out):', err);
+      }
+
+      console.log('Rendering profile.pug (login/signup)');
+      return res.render('profile', {
         pageTitle: 'Log in/Sign Up | Bikes SF',
-        cartCount: count || 0,
+        cartCount: (count || 0),
         error
       });
     });
   }
 
-  // If logged in -> show user profile dashboard
+  // Logged in -> show user profile
   const user = req.session.user;
+  console.log('User is logged in, id =', user.id);
 
-  getCartCount(req.session.userId, (err, count) => {
-    res.render('user-profile', {
-      pageTitle: 'Your Profile | Bikes SF',
-      cartCount: count || 0,
-      user,
-      // if you haven't wired DB history yet, just send empty arrays:
-      purchases: [],
-      sales: []
+  getCartCount(req.session.userId, (err, cartCount) => {
+    if (err) {
+      console.error('getCartCount error (logged in):', err);
+    }
+
+    getUserSellingHistory(user.id, (err2, sales) => {
+      if (err2) {
+        console.error('getUserSellingHistory error:', err2);
+        sales = [];
+      }
+
+      console.log('Selling history for user', user.id, sales);
+
+      return res.render('user-profile', {
+        pageTitle: 'Your Profile | Bikes SF',
+        cartCount: (cartCount || 0),
+        user,
+        purchases: [],   // you can wire these later
+        sales
+      });
     });
   });
 });
+
 
 
 // --- AUTH ROUTES ---
@@ -205,6 +223,11 @@ function renderAuthError(req, res, message) {
 
 // sell get
 app.get('/sell.html', (req, res) => {
+  if (!req.session.user) {
+    // send them to login/signup first
+    return res.redirect('/profile?error=Please log in to sell a bike.');
+  }
+
   getCartCount(req.session.userId, (err, count) => {
     res.render('sell', {
       pageTitle: 'Sell a Bike | Bikes SF',
@@ -212,6 +235,7 @@ app.get('/sell.html', (req, res) => {
     });
   });
 });
+
 
 // sell post
 app.post('/sell', (req, res) => {
@@ -231,6 +255,8 @@ app.post('/sell', (req, res) => {
         console.error('Error inserting listing:', err);
         return res.status(500).send('Error saving your listing.');
       }
+    console.log('Created listing', { listingId, sellerId });
+
 
       // redirect based on category as before
       switch (category) {
@@ -449,43 +475,7 @@ app.post('/cart/clear', (req, res) => {
   });
 });
 
-// Profile route: login/signup if logged out, user profile if logged in
-app.get('/profile', (req, res) => {
-  const error = req.query.error || null;
 
-  // If NOT logged in -> show login / signup page
-  if (!req.session.user) {
-    return getCartCount(req.session.userId, (err, count) => {
-      res.render('profile', {
-        pageTitle: 'Log in/Sign Up | Bikes SF',
-        cartCount: count || 0,
-        error
-      });
-    });
-  }
-
-  // Logged in -> show user profile
-  const user = req.session.user;
-
-  getCartCount(req.session.userId, (err, cartCount) => {
-    if (err) console.error(err);
-
-    getUserSellingHistory(user.id, (err2, sales) => {
-      if (err2) {
-        console.error(err2);
-        sales = [];
-      }
-
-      res.render('user-profile', {
-        pageTitle: 'Your Profile | Bikes SF',
-        cartCount: cartCount || 0,
-        user,
-        purchases: [],  // hook up later
-        sales
-      });
-    });
-  });
-});
 
 
 // Simple checkout route
