@@ -16,34 +16,33 @@ const {
   removeFromCart,
   clearCart,
   getCartCount,
-  getUserPurchaseHistory,    // if you have it
-  getUserSellingHistory      // <-- this must be here
+  createOrderFromCart,
+  getUserPurchaseHistory,
+  getUserSellingHistory
 } = require('./db');
-
 
 const app = express();
 const PORT = 3000;
 
-// Session middleware for user identification
+// Session middleware
 app.use(session({
   secret: 'bikes-sf-secret-key-change-in-production',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Set to true with HTTPS
+  cookie: { secure: false }
 }));
 
-// pug
+// Pug setup
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // For AJAX requests
+app.use(express.json());
 
-// Initialize session ID for cart if needed
+// Initialize session ID for cart
 app.use((req, res, next) => {
   if (!req.session.userId) {
-    // This userId is for the cart (anonymous or logged in)
     req.session.userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
   next();
@@ -55,7 +54,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ----- routes ----- //
+// ----- ROUTES ----- //
 
 // Home page
 app.get('/', (req, res) => {
@@ -67,19 +66,13 @@ app.get('/', (req, res) => {
   });
 });
 
+// Profile page
 app.get('/profile', (req, res) => {
-  console.log('GET /profile, session.user =', req.session.user);
-
   const error = req.query.error || null;
+  const orderSuccess = req.query.orderSuccess || null;
 
-  // Not logged in -> show login/signup page
   if (!req.session.user) {
     return getCartCount(req.session.userId, (err, count) => {
-      if (err) {
-        console.error('getCartCount error (logged out):', err);
-      }
-
-      console.log('Rendering profile.pug (login/signup)');
       return res.render('profile', {
         pageTitle: 'Log in/Sign Up | Bikes SF',
         cartCount: (count || 0),
@@ -88,35 +81,33 @@ app.get('/profile', (req, res) => {
     });
   }
 
-  // Logged in -> show user profile
   const user = req.session.user;
-  console.log('User is logged in, id =', user.id);
 
   getCartCount(req.session.userId, (err, cartCount) => {
-    if (err) {
-      console.error('getCartCount error (logged in):', err);
-    }
-
-    getUserSellingHistory(user.id, (err2, sales) => {
+    getUserPurchaseHistory(user.id, (err2, purchases) => {
       if (err2) {
-        console.error('getUserSellingHistory error:', err2);
-        sales = [];
+        console.error('getUserPurchaseHistory error:', err2);
+        purchases = [];
       }
 
-      console.log('Selling history for user', user.id, sales);
+      getUserSellingHistory(user.id, (err3, sales) => {
+        if (err3) {
+          console.error('getUserSellingHistory error:', err3);
+          sales = [];
+        }
 
-      return res.render('user-profile', {
-        pageTitle: 'Your Profile | Bikes SF',
-        cartCount: (cartCount || 0),
-        user,
-        purchases: [],   // you can wire these later
-        sales
+        return res.render('user-profile', {
+          pageTitle: 'Your Profile | Bikes SF',
+          cartCount: (cartCount || 0),
+          user,
+          purchases,
+          sales,
+          orderSuccess
+        });
       });
     });
   });
 });
-
-
 
 // --- AUTH ROUTES ---
 
@@ -132,7 +123,6 @@ app.post('/auth/signup', (req, res) => {
     return renderAuthError(req, res, 'Passwords do not match.');
   }
 
-  // Check if email already exists
   getUserByEmail(email, (err, existingUser) => {
     if (err) {
       console.error('Error checking user by email:', err);
@@ -143,7 +133,6 @@ app.post('/auth/signup', (req, res) => {
       return renderAuthError(req, res, 'An account with that email already exists.');
     }
 
-    // Hash password and create user
     bcrypt.hash(password, 10, (err, passwordHash) => {
       if (err) {
         console.error('Error hashing password:', err);
@@ -156,7 +145,6 @@ app.post('/auth/signup', (req, res) => {
           return renderAuthError(req, res, 'Something went wrong. Please try again.');
         }
 
-        // Log them in
         req.session.user = { id: userId, name, email };
         res.redirect('/');
       });
@@ -192,7 +180,6 @@ app.post('/auth/login', (req, res) => {
         return renderAuthError(req, res, 'Invalid email or password.');
       }
 
-      // Success: store user info in session
       req.session.user = {
         id: user.id,
         name: user.name,
@@ -206,11 +193,10 @@ app.post('/auth/login', (req, res) => {
 
 // Logout
 app.post('/auth/logout', (req, res) => {
-  req.session.user = null; // keep cart session if you like
+  req.session.user = null;
   res.redirect('/');
 });
 
-// Helper: render profile page with error
 function renderAuthError(req, res, message) {
   getCartCount(req.session.userId, (err, count) => {
     res.status(400).render('profile', {
@@ -221,10 +207,9 @@ function renderAuthError(req, res, message) {
   });
 }
 
-// sell get
+// Sell GET
 app.get('/sell.html', (req, res) => {
   if (!req.session.user) {
-    // send them to login/signup first
     return res.redirect('/profile?error=Please log in to sell a bike.');
   }
 
@@ -236,8 +221,7 @@ app.get('/sell.html', (req, res) => {
   });
 });
 
-
-// sell post
+// Sell POST
 app.post('/sell', (req, res) => {
   const { name, location, price, description, imageUrl, category, condition } = req.body;
 
@@ -245,7 +229,6 @@ app.post('/sell', (req, res) => {
     return res.status(400).send('Missing required fields.');
   }
 
-  // If logged in, attach the user as seller; otherwise null
   const sellerId = req.session.user ? req.session.user.id : null;
 
   createListing(
@@ -255,10 +238,7 @@ app.post('/sell', (req, res) => {
         console.error('Error inserting listing:', err);
         return res.status(500).send('Error saving your listing.');
       }
-    console.log('Created listing', { listingId, sellerId });
 
-
-      // redirect based on category as before
       switch (category) {
         case 'bikes':
           return res.redirect('/buy.html');
@@ -275,12 +255,7 @@ app.post('/sell', (req, res) => {
   );
 });
 
-
-
-
-
-
-// Category pages rendered with Pug, pulling from DB
+// Category pages
 app.get('/buy.html', (req, res) => {
   getListingsByCategory('bikes', (err, listings) => {
     if (err) return res.status(500).send('Error loading bikes.');
@@ -370,9 +345,6 @@ app.post('/cart/add', (req, res) => {
   const { productId } = req.body;
   const userId = req.session.userId;
   
-  console.log('Adding to cart - userId:', userId, 'productId:', productId);
-  
-  // First verify the product exists
   getListingById(productId, (err, listing) => {
     if (err) {
       console.error('Error finding product:', err);
@@ -380,29 +352,16 @@ app.post('/cart/add', (req, res) => {
     }
     
     if (!listing) {
-      console.error('Product not found:', productId);
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
     
-    // Product exists, now add to cart
     addToCart(userId, productId, (err) => {
       if (err) {
         console.error('Error adding to cart:', err);
-        return res.status(500).json({ success: false, message: 'Failed to add to cart: ' + err.message });
+        return res.status(500).json({ success: false, message: 'Failed to add to cart' });
       }
       
-      console.log('Successfully added to cart');
-      
       getCartCount(userId, (err, count) => {
-        if (err) {
-          console.error('Error getting cart count:', err);
-          return res.json({ 
-            success: true, 
-            cartCount: 0,
-            message: 'Item added to cart'
-          });
-        }
-        
         res.json({ 
           success: true, 
           cartCount: count || 0,
@@ -475,33 +434,70 @@ app.post('/cart/clear', (req, res) => {
   });
 });
 
+// Checkout GET
+app.get('/checkout', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/profile?error=Please log in before checking out.');
+  }
 
+  const userId = req.session.userId;
+  
+  getCartItems(userId, (err, cartItems) => {
+    if (err) {
+      console.error('Error loading cart for checkout:', err);
+      return res.status(500).send('Error loading cart.');
+    }
+    
+    if (!cartItems || cartItems.length === 0) {
+      return res.redirect('/cart');
+    }
+    
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    res.render('checkout', {
+      pageTitle: 'Checkout | Bikes SF',
+      cartItems,
+      total,
+      cartCount: cartItems.length,
+      user: req.session.user
+    });
+  });
+});
 
-
-// Simple checkout route
+// Checkout POST
 app.post('/checkout', (req, res) => {
-  // Must be logged in to checkout
   if (!req.session.user) {
     return res.redirect('/profile?error=Please log in before checking out.');
   }
 
   const userId = req.session.user.id;
   const cartUserId = req.session.userId;
+  
+  const { shippingAddress, city, state, zipCode, phone } = req.body;
 
-  createOrderFromCart(userId, cartUserId, (err, orderId) => {
+  if (!shippingAddress || !city || !state || !zipCode || !phone) {
+    return res.status(400).send('Please fill in all shipping information.');
+  }
+
+  const shippingInfo = {
+    shippingAddress,
+    city,
+    state,
+    zipCode,
+    phone
+  };
+
+  createOrderFromCart(userId, cartUserId, shippingInfo, (err, orderId) => {
     if (err) {
       console.error('Checkout error:', err);
       return res.status(500).send('Error while checking out.');
     }
 
-    // Redirect to profile with a little success flag
     res.redirect('/profile?orderSuccess=1');
   });
 });
 
-
-
-// server start
+// Server start
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Using SQLite database at: ${dbPath}`);
