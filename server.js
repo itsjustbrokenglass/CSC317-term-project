@@ -506,27 +506,40 @@ app.get('/search', (req, res) => {
   }
 
   const sql = `
-    SELECT id, name, location, price, description, imageUrl, category, condition
+    SELECT id, name, description
     FROM listings
-    WHERE name LIKE ? OR description LIKE ? OR category LIKE ?
-    ORDER BY createdAt DESC
+    WHERE name LIKE ? OR description LIKE ?
   `;
 
   const wildcard = `%${query}%`;
 
-  db.all(sql, [wildcard, wildcard, wildcard], (err, results) => {
+  db.all(sql, [wildcard, wildcard], (err, results) => {
     if (err) return res.status(500).send("Search error");
 
-    getCartCount(req.session.userId, (err2, count) => {
-      res.render('search-results', {
-        pageTitle: `Search results for "${query}"`,
-        query,
-        results,
-        cartCount: count || 0
-      });
-    });
+    // No matches
+    if (!results || results.length === 0) {
+      return res.send("No products found.");
+    }
+
+    // ONE MATCH → go straight to product page
+    if (results.length === 1) {
+      return res.redirect('/product/' + results[0].id);
+    }
+
+    // MULTIPLE MATCHES → choose the one with exact name match (case insensitive)
+    const exactMatch = results.find(
+      item => item.name.toLowerCase() === query.toLowerCase()
+    );
+
+    if (exactMatch) {
+      return res.redirect('/product/' + exactMatch.id);
+    }
+
+    // Otherwise → show first match OR a results page
+    return res.redirect('/product/' + results[0].id);
   });
 });
+
 
 // Server start
 app.listen(PORT, () => {
