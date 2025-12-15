@@ -3,6 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const {
+  db,
   dbPath,
   createUser,
   getUserByEmail,
@@ -494,6 +495,36 @@ app.post('/checkout', (req, res) => {
     }
 
     res.redirect('/profile?orderSuccess=1');
+  });
+});
+
+app.get('/search', (req, res) => {
+  const query = req.query.q;
+
+  if (!query || query.trim() === "") {
+    return res.redirect('/');
+  }
+
+  const sql = `
+    SELECT id, name, location, price, description, imageUrl, category, condition
+    FROM listings
+    WHERE name LIKE ? OR description LIKE ? OR category LIKE ?
+    ORDER BY createdAt DESC
+  `;
+
+  const wildcard = `%${query}%`;
+
+  db.all(sql, [wildcard, wildcard, wildcard], (err, results) => {
+    if (err) return res.status(500).send("Search error");
+
+    getCartCount(req.session.userId, (err2, count) => {
+      res.render('search-results', {
+        pageTitle: `Search results for "${query}"`,
+        query,
+        results,
+        cartCount: count || 0
+      });
+    });
   });
 });
 
