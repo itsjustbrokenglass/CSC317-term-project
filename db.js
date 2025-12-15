@@ -28,7 +28,7 @@ db.serialize(() => {
       imageUrl TEXT,
       category TEXT NOT NULL,
       condition TEXT NOT NULL,
-      sellerId INTEGER, -- who submitted the Sell form
+      sellerId INTEGER,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -46,12 +46,17 @@ db.serialize(() => {
     )
   `);
 
-    // Orders table (completed checkouts)
+  // Orders table (completed checkouts)
   db.run(`
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       userId INTEGER NOT NULL,
       total REAL NOT NULL,
+      shippingAddress TEXT,
+      city TEXT,
+      state TEXT,
+      zipCode TEXT,
+      phone TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (userId) REFERENCES users(id)
     )
@@ -79,7 +84,6 @@ db.serialize(() => {
       FOREIGN KEY (sellerId) REFERENCES users(id)
     )
   `);
-
 });
 
 // ===== USER FUNCTIONS =====
@@ -107,7 +111,6 @@ function getUserById(id, callback) {
 
 // ===== LISTING FUNCTIONS =====
 
-// Create new listing
 function createListing(data, callback) {
   const { name, location, price, description, imageUrl, category, condition, sellerId } = data;
 
@@ -129,7 +132,6 @@ function createListing(data, callback) {
   );
 }
 
-// Get listings by category
 function getListingsByCategory(category, callback) {
   const sql = `
     SELECT id, name, location, price, description, imageUrl, category, condition, createdAt
@@ -141,7 +143,6 @@ function getListingsByCategory(category, callback) {
   db.all(sql, [category], callback);
 }
 
-// Get single listing by ID
 function getListingById(id, callback) {
   const sql = `
     SELECT id, name, location, price, description, imageUrl, category, condition, createdAt
@@ -154,27 +155,22 @@ function getListingById(id, callback) {
 
 // ===== CART FUNCTIONS =====
 
-// Add item to cart (or increment quantity if exists)
 function addToCart(userId, listingId, callback) {
-  // First check if item already in cart
   const checkSql = `SELECT id, quantity FROM cart WHERE userId = ? AND listingId = ?`;
   
   db.get(checkSql, [userId, listingId], (err, row) => {
     if (err) return callback(err);
     
     if (row) {
-      // Item exists, increment quantity
       const updateSql = `UPDATE cart SET quantity = quantity + 1 WHERE id = ?`;
       db.run(updateSql, [row.id], callback);
     } else {
-      // New item, insert
       const insertSql = `INSERT INTO cart (userId, listingId, quantity) VALUES (?, ?, 1)`;
       db.run(insertSql, [userId, listingId], callback);
     }
   });
 }
 
-// Get all cart items for a user with listing details
 function getCartItems(userId, callback) {
   const sql = `
     SELECT 
@@ -195,7 +191,6 @@ function getCartItems(userId, callback) {
   db.all(sql, [userId], callback);
 }
 
-// Update cart item quantity
 function updateCartQuantity(userId, listingId, quantity, callback) {
   const sql = `
     UPDATE cart 
@@ -206,19 +201,16 @@ function updateCartQuantity(userId, listingId, quantity, callback) {
   db.run(sql, [quantity, userId, listingId], callback);
 }
 
-// Remove item from cart
 function removeFromCart(userId, listingId, callback) {
   const sql = `DELETE FROM cart WHERE userId = ? AND listingId = ?`;
   db.run(sql, [userId, listingId], callback);
 }
 
-// Clear entire cart for user
 function clearCart(userId, callback) {
   const sql = `DELETE FROM cart WHERE userId = ?`;
   db.run(sql, [userId], callback);
 }
 
-// Get cart item count for user
 function getCartCount(userId, callback) {
   const sql = `SELECT COUNT(DISTINCT listingId) as count FROM cart WHERE userId = ?`;
   db.get(sql, [userId], (err, row) => {
@@ -227,9 +219,8 @@ function getCartCount(userId, callback) {
   });
 }
 
-// Link a listing to the seller (user)
 function assignListingToSeller(listingId, sellerId, callback) {
-  if (!sellerId) return callback && callback(null); // allow anonymous listings
+  if (!sellerId) return callback && callback(null);
   const sql = `
     INSERT OR REPLACE INTO listing_sellers (listingId, sellerId)
     VALUES (?, ?)
@@ -237,8 +228,9 @@ function assignListingToSeller(listingId, sellerId, callback) {
   db.run(sql, [listingId, sellerId], callback);
 }
 
-// Turn cart items into an order
-function createOrderFromCart(userId, cartUserId, callback) {
+// ===== ORDER FUNCTIONS =====
+
+function createOrderFromCart(userId, cartUserId, shippingInfo, callback) {
   const getCartSql = `
     SELECT c.listingId, c.quantity, l.price
     FROM cart c
@@ -254,9 +246,12 @@ function createOrderFromCart(userId, cartUserId, callback) {
 
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+    const { shippingAddress, city, state, zipCode, phone } = shippingInfo;
+
     db.run(
-      `INSERT INTO orders (userId, total) VALUES (?, ?)`,
-      [userId, total],
+      `INSERT INTO orders (userId, total, shippingAddress, city, state, zipCode, phone) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [userId, total, shippingAddress, city, state, zipCode, phone],
       function (err) {
         if (err) return callback(err);
         const orderId = this.lastID;
@@ -273,7 +268,6 @@ function createOrderFromCart(userId, cartUserId, callback) {
         stmt.finalize(err2 => {
           if (err2) return callback(err2);
 
-          // Clear cart after successful order
           db.run(`DELETE FROM cart WHERE userId = ?`, [cartUserId], err3 => {
             if (err3) return callback(err3);
             callback(null, orderId);
@@ -284,7 +278,6 @@ function createOrderFromCart(userId, cartUserId, callback) {
   });
 }
 
-// Get "what I bought" for a user
 function getUserPurchaseHistory(userId, callback) {
   const sql = `
     SELECT 
@@ -305,8 +298,6 @@ function getUserPurchaseHistory(userId, callback) {
   db.all(sql, [userId], callback);
 }
 
-
-
 function getUserSellingHistory(userId, callback) {
   const sql = `
     SELECT 
@@ -325,8 +316,6 @@ function getUserSellingHistory(userId, callback) {
   db.all(sql, [userId], callback);
 }
 
-
-
 module.exports = {
   db,
   dbPath,
@@ -342,6 +331,8 @@ module.exports = {
   removeFromCart,
   clearCart,
   getCartCount,
+  createOrderFromCart,
+  getUserPurchaseHistory,
   getUserSellingHistory
 };
 
