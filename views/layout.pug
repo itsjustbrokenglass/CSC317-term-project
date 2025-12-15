@@ -136,10 +136,10 @@ html(lang="en")
       .logo-search-cart-signin
         h1
           a.logo-link(href="/") Bikes SF
-        input#search(type="text" placeholder="Search bikes, parts, and more")
+        input#search(type="text" placeholder="Search bikes, parts, and more" onkeydown="if (event.key === 'Enter') { event.preventDefault(); performSearch(); }")
         ul.icon-list
           li
-            img.icon(src="/search.png" alt="Search" onclick="alert('Search functionality coming soon!')")
+            img.icon(src="/search.png" alt="Search" onclick="performSearch()")
           li
             a(href="/cart")
               .cart-icon-wrapper
@@ -149,6 +149,8 @@ html(lang="en")
                 else
                   span.cart-count.hidden 0
 
+
+
       nav.product-options
         ul.nav-list
           li: a(href="/buy.html") Bikes
@@ -156,6 +158,8 @@ html(lang="en")
           li: a(href="/accessories.html") Accessories
           li: a(href="/parts.html") Parts
           li: a(href="/sell.html") Sell
+
+
 
     block content
 
