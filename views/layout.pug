@@ -159,7 +159,14 @@ html(lang="en")
           li: a(href="/parts.html") Parts
           li: a(href="/sell.html") Sell
 
-
+    script.
+      function performSearch() {
+        var input = document.getElementById('search');
+        if (!input) return;
+        var query = input.value.trim();
+        if (!query) return;
+        window.location.href = '/search?q=' + encodeURIComponent(query);
+      }
 
     block content
 
