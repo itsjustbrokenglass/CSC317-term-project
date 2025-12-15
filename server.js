@@ -516,17 +516,24 @@ app.get('/search', (req, res) => {
   db.all(sql, [wildcard, wildcard], (err, results) => {
     if (err) return res.status(500).send("Search error");
 
-    // No matches
+    // 0 RESULTS → render the "no results" page like before
     if (!results || results.length === 0) {
-      return res.send("No products found.");
+      return getCartCount(req.session.userId, (err2, count) => {
+        res.render('search-results', {
+          pageTitle: `Search results for "${query}"`,
+          query,
+          results: [],           // empty list, so template shows "no results"
+          cartCount: count || 0
+        });
+      });
     }
 
-    // ONE MATCH → go straight to product page
+    // 1 RESULT → go straight to product page
     if (results.length === 1) {
       return res.redirect('/product/' + results[0].id);
     }
 
-    // MULTIPLE MATCHES → choose the one with exact name match (case insensitive)
+    // MULTIPLE RESULTS → try exact match by name
     const exactMatch = results.find(
       item => item.name.toLowerCase() === query.toLowerCase()
     );
@@ -535,10 +542,11 @@ app.get('/search', (req, res) => {
       return res.redirect('/product/' + exactMatch.id);
     }
 
-    // Otherwise → show first match OR a results page
+    // Otherwise → just go to the first result
     return res.redirect('/product/' + results[0].id);
   });
 });
+
 
 
 // Server start
