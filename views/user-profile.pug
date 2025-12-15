@@ -31,51 +31,56 @@ block content
           if !purchases || purchases.length === 0
             p.empty-text You haven't purchased anything yet. Browse bikes and gear to get started!
           else
-            table.history-table
-              thead
-                tr
-                  th Date
-                  th Order #
-                  th Item
-                  th Qty
-                  th Price
-              tbody
-                each item in purchases
-                  tr
-                    td= item.createdAt
-                    td= item.orderId
-                    td
-                      a(href=`/product/${item.listingId}`)= item.name
-                    td= item.quantity
-                    - const price = Number(item.priceAtPurchase || 0).toFixed(2);
-                    td $#{price}
+            .purchase-list
+              - let currentOrderId = null;
+              - let orderTotal = 0;
+              - let orderDate = '';
+              each item in purchases
+                if item.orderId !== currentOrderId
+                  if currentOrderId !== null
+                    .order-total
+                      span Order Total:
+                      span.total-price $#{orderTotal.toFixed(2)}
+                  - currentOrderId = item.orderId;
+                  - orderTotal = 0;
+                  - orderDate = new Date(item.createdAt).toLocaleDateString();
+                  .order-header
+                    h3 Order ##{item.orderId}
+                    span.order-date= orderDate
+                .purchase-item
+                  img(src=item.imageUrl || '/brown-road-bike-free-png.png', alt=item.name)
+                  .item-info
+                    a.item-name(href=`/product/${item.listingId}`)= item.name
+                    p.item-qty Quantity: #{item.quantity}
+                  - const price = Number(item.priceAtPurchase || 0);
+                  - orderTotal += price * item.quantity;
+                  p.item-price $#{(price * item.quantity).toFixed(2)}
+              if currentOrderId !== null
+                .order-total
+                  span Order Total:
+                  span.total-price $#{orderTotal.toFixed(2)}
 
       // SELLING HISTORY
-      section.profile-card
+      section.profile-card.full-width
         h2.card-title Selling History
         .card-body
           if !sales || sales.length === 0
             p.empty-text You haven't listed anything for sale yet.
           else
-            table.history-table
-              thead
-                tr
-                  th Date Listed
-                  th Item
-                  th Price
-              tbody
-                each s in sales
-                  tr
-                    td= s.createdAt
-                    td
-                      a(href=`/product/${s.id}`)= s.name
+            .selling-grid
+              each s in sales
+                .selling-item
+                  img(src=s.imageUrl || '/brown-road-bike-free-png.png', alt=s.name)
+                  .selling-info
+                    a.item-name(href=`/product/${s.id}`)= s.name
                     - const sPrice = Number(s.price || 0).toFixed(2);
-                    td $#{sPrice}
+                    p.item-price $#{sPrice}
+                    p.item-date Listed: #{new Date(s.createdAt).toLocaleDateString()}
 
   // Page-specific styles
   style.
     .profile-page {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 24px 16px 48px;
       font-family: "Josefin Sans", sans-serif;
@@ -105,59 +110,68 @@ block content
     }
 
     .logout-button {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid #111827;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 2px solid #222;
       background: white;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 15px;
+      font-family: "Josefin Sans", sans-serif;
+      transition: all 0.2s ease;
     }
 
     .logout-button:hover {
-      background: #111827;
+      background: #222;
       color: white;
     }
 
     .profile-alert {
-      background: #ecfdf5;
-      border: 1px solid #6ee7b7;
-      color: #047857;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      margin-bottom: 18px;
+      background: #d1fae5;
+      border: 2px solid #10b981;
+      color: #065f46;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      font-weight: 600;
     }
 
     .profile-grid {
       display: grid;
-      grid-template-columns: 1.1fr 1.4fr;
-      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
     }
 
     .profile-card {
       background: white;
       border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(15,23,42,0.08);
-      padding: 16px 18px 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      min-height: 0;
+    }
+    
+    .profile-card.full-width {
+      grid-column: 1 / -1;
     }
 
     .card-title {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e5e5;
     }
 
     .card-body {
-      font-size: 0.9rem;
-      overflow-x: auto;
+      font-size: 0.95rem;
+      flex: 1;
     }
 
     .info-list {
       display: grid;
       grid-template-columns: max-content 1fr;
-      gap: 6px 18px;
+      gap: 12px 20px;
     }
 
     .info-list dt {
@@ -167,49 +181,150 @@ block content
 
     .info-list dd {
       margin: 0;
+      color: #222;
     }
 
     .empty-text {
       color: #6b7280;
       font-size: 0.9rem;
+      text-align: center;
+      padding: 20px;
     }
 
-    .history-table {
-      width: 100%;
-      border-collapse: collapse;
+    .purchase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e5e5;
+      margin-bottom: 12px;
+    }
+    
+    .order-header h3 {
+      font-size: 1.1rem;
+      margin: 0;
+      color: #222;
+    }
+    
+    .order-date {
       font-size: 0.85rem;
+      color: #666;
     }
 
-    .history-table th,
-    .history-table td {
-      padding: 6px 8px;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
-      white-space: nowrap;
+    .purchase-item {
+      display: grid;
+      grid-template-columns: 70px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px;
+      background: #fdf7ef;
+      border-radius: 10px;
+      margin-bottom: 8px;
     }
 
-    .history-table th {
+    .purchase-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .item-name {
       font-weight: 600;
-      color: #4b5563;
-      font-size: 0.8rem;
-    }
-
-    .history-table tr:hover td {
-      background: #f9fafb;
-    }
-
-    .history-table a {
-      color: #111827;
+      color: #222;
       text-decoration: none;
+      font-size: 0.95rem;
+      line-height: 1.3;
     }
 
-    .history-table a:hover {
+    .item-name:hover {
       text-decoration: underline;
+      color: #15803d;
     }
 
-    @media (max-width: 900px) {
+    .item-qty {
+      font-size: 0.85rem;
+      color: #666;
+      margin: 0;
+    }
+
+    .item-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #15803d;
+      margin: 0;
+    }
+    
+    .order-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #222;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    
+    .total-price {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    
+    .selling-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .selling-item {
+      background: #fdf7ef;
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .selling-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .selling-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .item-date {
+      font-size: 0.8rem;
+      color: #666;
+      margin: 0;
+    }
+
+    @media (max-width: 968px) {
       .profile-grid {
         grid-template-columns: 1fr;
+      }
+      
+      .selling-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       }
     }
 
@@ -220,13 +335,44 @@ block content
 
       .profile-header {
         align-items: flex-start;
+        flex-direction: column;
       }
 
       .profile-title {
         font-size: 1.6rem;
       }
+      
+      .logout-form {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .logout-button {
+        width: 100%;
+      }
 
       .profile-card {
-        padding: 14px 14px 16px;
+        padding: 18px;
+      }
+      
+      .purchase-item {
+        grid-template-columns: 60px 1fr;
+        gap: 10px;
+      }
+      
+      .purchase-item img {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .item-price {
+        grid-column: 1 / -1;
+        text-align: right;
+        padding-top: 8px;
+        border-top: 1px solid #e5e5e5;
+      }
+      
+      .selling-grid {
+        grid-template-columns: 1fr;
       }
     }
