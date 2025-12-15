@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  main.search-results
+    h1 Search Results for "#{query}"
+
+    if results.length === 0
+      p No matching items found.
+    else
+      .results-grid
+        each item in results
+          a.result-card(href=`/product/${item.id}`)
+            img(src=item.imageUrl || '/brown-road-bike-free-png.png')
+            h2= item.name
+            p.price $#{item.price.toFixed(2)}
+            p.category= item.category.charAt(0).toUpperCase() + item.category.slice(1)
