@@ -9,7 +9,7 @@ block content
         p.hero-subtitle Or give your bike a new home.
         
         .hero-buttons
-          button.btn-hero.btn-buy(type="button" onclick="window.location.href='/buy.html'") Buy
+          button.btn-hero.btn-buy(type="button" onclick="window.location.href='/buy.html'") Browse Buy
           button.btn-hero.btn-sell(type="button" onclick="window.location.href='/sell.html'") Sell
 
   //- CATEGORY SECTION (Transparent Circles with Black Border)
@@ -44,12 +44,29 @@ block content
             img(src="/icon-parts.png" alt="Parts")
         button.category-button(onclick="window.location.href='/parts.html'") Parts
 
+    //- NEW: ALL PRODUCTS SECTION (Fresh Arrivals)
+    if listings && listings.length > 0
+      h2.section-title Fresh Arrivals
+      .product-grid
+        each item in listings
+          .product-card
+            a.card-link-wrapper(href=`/product/${item.id}`)
+              .card-image-container
+                img(src=item.imageUrl alt=item.name)
+                if item.condition
+                  span.condition-badge= item.condition
+              .card-info
+                h3= item.name
+                p.price $#{item.price}
+                span.view-btn View Details
+    else
+      p.no-items-msg No products listed yet. Be the first to sell!
+
   //- STYLES
   style.
     /* Hero Styles */
     .hero-section {
       position: relative;
-      /* Ensure 'hero-bg.jpg' is in your public folder! */
       background-image: url('/hero-bg.jpg'); 
       background-size: cover;
       background-position: center;
@@ -111,18 +128,19 @@ block content
     .btn-sell:hover { background-color: #1f3a63; transform: translateY(-3px); }
     
     /* --- CATEGORY STYLES --- */
-    .page-content h2 {
+    .page-content h2, .section-title {
       text-align: center;
       font-size: 32px;
       margin-bottom: 40px;
       font-weight: 600;
+      color: #222;
     }
 
     .category-icons {
       display: flex;
       justify-content: center;
       gap: 50px;
-      margin: 0 auto 60px;
+      margin: 0 auto 80px; /* Increased margin to separate from grid */
       flex-wrap: wrap;
       max-width: 1000px;
     }
@@ -179,8 +197,71 @@ block content
       color: white;
     }
 
+    /* --- NEW PRODUCT GRID STYLES --- */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+    }
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid #eee;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .card-link-wrapper { text-decoration: none; color: inherit; display: block; height: 100%; }
+    
+    .card-image-container {
+      height: 220px;
+      width: 100%;
+      background: #f9f9f9;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .condition-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .card-info { padding: 20px; text-align: center; }
+    .card-info h3 { font-size: 18px; margin: 0 0 10px; color: #222; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .price { font-size: 20px; color: #15803d; font-weight: 700; margin: 0 0 15px; }
+    .view-btn {
+      display: inline-block;
+      padding: 8px 24px;
+      border: 2px solid #222;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #222;
+      transition: all 0.2s;
+    }
+    .product-card:hover .view-btn { background: #222; color: white; }
+    .no-items-msg { text-align: center; color: #888; font-style: italic; margin-bottom: 60px; }
+
     @media (max-width: 768px) {
       .hero-content h1 { font-size: 36px; }
       .category-icons { gap: 30px; }
       .circle-icon { width: 100px; height: 100px; }
+      .product-grid { grid-template-columns: 1fr; }
     }
