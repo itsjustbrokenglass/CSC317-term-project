@@ -60,19 +60,18 @@ app.use((req, res, next) => {
 
 // Home page
 app.get('/', (req, res) => {
-  getCartCount(req.session.userId, (err, count) => {
-    res.render('index', {
-      pageTitle: 'Bikes SF',
-      cartCount: count || 0
-    });
-  });
-});
-
-app.get('/about', (req, res) => {
-  getCartCount(req.session.userId, (err, count) => {
-    res.render('about', {
-      pageTitle: 'About Us | Bikes SF',
-      cartCount: count || 0
+  getAllListings((err, listings) => {
+    if (err) {
+      console.error(err);
+      listings = []; 
+    }
+    
+    getCartCount(req.session.userId, (err, count) => {
+      res.render('index', {
+        pageTitle: 'Bikes SF',
+        cartCount: count || 0,
+        listings: listings 
+      });
     });
   });
 });
@@ -81,6 +80,16 @@ app.get('/faq', (req, res) => {
   getCartCount(req.session.userId, (err, count) => {
     res.render('faq', {
       pageTitle: 'FAQ | Bikes SF',
+      cartCount: count || 0
+    });
+  });
+});
+
+// About Page
+app.get('/about', (req, res) => {
+  getCartCount(req.session.userId, (err, count) => {
+    res.render('about', {
+      pageTitle: 'About Us | Bikes SF',
       cartCount: count || 0
     });
   });
@@ -557,7 +566,7 @@ app.get('/search', (req, res) => {
     if (exactMatch) {
       return res.redirect('/product/' + exactMatch.id);
     }
-    
+
     return res.redirect('/product/' + results[0].id);
   });
 });
