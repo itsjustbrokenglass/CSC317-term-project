@@ -21,6 +21,7 @@ html(lang="en")
         p.tagline Your one stop shop for used and new bike products in San Francisco!
         ul
           li: a(href="/") Home
+          li: a(href="/about") About Us
           li: a(href="/faq") FAQ 
           li
             if currentUser
@@ -64,7 +65,7 @@ html(lang="en")
             .footer-column
               h3 Resources
               ul.footer-list
-                li Our Mission
+                li li: a(href="/about") Our Mission
                 li Bike Safety
                 li: a(href="/faq") FAQ
             .footer-column
