@@ -19,7 +19,8 @@ const {
   getCartCount,
   createOrderFromCart,
   getUserPurchaseHistory,
-  getUserSellingHistory
+  getUserSellingHistory,
+  getAllListings
 } = require('./db');
 
 const app = express();
