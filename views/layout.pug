@@ -4,129 +4,24 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title= pageTitle || 'Bikes SF'
-
-    // Google Fonts
     link(rel="preconnect" href="https://fonts.googleapis.com")
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
-    link(
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    )
-
+    link(href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet")
     link(rel="stylesheet" href="/style.css")
-    
     style.
-      .cart-icon-wrapper {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-      }
-      
-      .cart-icon-wrapper:hover {
-        transform: scale(1.1);
-      }
-      
-      .cart-icon-wrapper:active {
-        transform: scale(0.95);
-      }
-      
-      .cart-count {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background-color: #dc2626;
-        color: white;
-        border-radius: 50%;
-        min-width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 700;
-        border: 2px solid #f7efe7;
-        padding: 0 4px;
-        animation: popIn 0.3s ease;
-      }
-      
-      .cart-count.hidden {
-        display: none;
-      }
-      
-      @keyframes popIn {
-        0% {
-          transform: scale(0);
-        }
-        50% {
-          transform: scale(1.2);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-      
-      /* Mobile responsive adjustments */
-      @media (max-width: 768px) {
-        .logo-search-cart-signin {
-          flex-wrap: wrap;
-          gap: 12px;
-        }
-        
-        .logo-search-cart-signin h1 {
-          font-size: 28px;
-        }
-        
-        .icon-list {
-          gap: 16px;
-        }
-        
-        .cart-count {
-          top: -6px;
-          right: -6px;
-          min-width: 18px;
-          height: 18px;
-          font-size: 10px;
-          border-width: 2px;
-        }
-      }
-      
-      @media (max-width: 480px) {
-        .about-faq {
-          flex-direction: column;
-          gap: 8px;
-          text-align: center;
-          padding: 8px 20px;
-        }
-        
-        .about-faq ul {
-          justify-content: center;
-        }
-        
-        .logo-search-cart-signin {
-          padding: 16px 20px;
-        }
-        
-        .logo-search-cart-signin h1 {
-          font-size: 24px;
-        }
-        
-        .icon {
-          width: 24px;
-          height: 24px;
-        }
-      }
-      
+      .cart-icon-wrapper { position: relative; display: inline-block; transition: transform 0.2s; }
+      .cart-icon-wrapper:hover { transform: scale(1.1); }
+      .cart-count { position: absolute; top: -8px; right: -8px; background: #dc2626; color: white; border-radius: 50%; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid #f7efe7; }
+      .cart-count.hidden { display: none; }
+      @media (max-width: 768px) { .logo-search-cart-signin { flex-wrap: wrap; gap: 12px; } }
+
   body
     header.nav-bar
       .about-faq
         p.tagline Your one stop shop for used and new bike products in San Francisco!
         ul
-          li
-            a(href="/") Home
-          li
-            a(href="#") FAQ 
-
+          li: a(href="/") Home
+          li: a(href="/faq") FAQ 
           li
             if currentUser
               a(href="/profile") User Profile
@@ -134,22 +29,18 @@ html(lang="en")
               a(href="/profile") Log In/Sign Up
 
       .logo-search-cart-signin
-        h1
-          a.logo-link(href="/") Bikes SF
-        input#search(type="text" placeholder="Search bikes, parts, and more" onkeydown="if (event.key === 'Enter') { event.preventDefault(); performSearch(); }")
+        h1: a.logo-link(href="/") Bikes SF
+        input#search(type="text" placeholder="Search bikes..." onkeydown="if (event.key === 'Enter') { performSearch(); }")
         ul.icon-list
-          li
-            img.icon(src="/search.png" alt="Search" onclick="performSearch()")
+          li: img.icon(src="/search.png" alt="Search" onclick="performSearch()")
           li
             a(href="/cart")
               .cart-icon-wrapper
-                img.icon(src="/cart.png" alt="Shopping Cart")
+                img.icon(src="/cart.png" alt="Cart")
                 if cartCount && cartCount > 0
                   span.cart-count= cartCount
                 else
                   span.cart-count.hidden 0
-
-
 
       nav.product-options
         ul.nav-list
@@ -159,6 +50,32 @@ html(lang="en")
           li: a(href="/parts.html") Parts
           li: a(href="/sell.html") Sell
 
+    block content
+
+    .footer-parent
+      footer
+        .footer-main
+          .footer-brand: h1 Bikes SF
+          .learn-more
+            h2 Sell With Us
+            p Sell your used parts today.
+            a.learn-more-link(href="/sell.html") Learn More →
+          .footer-links
+            .footer-column
+              h3 Resources
+              ul.footer-list
+                li Our Mission
+                li Bike Safety
+                li: a(href="/faq") FAQ
+            .footer-column
+              h3 Legal
+              ul.footer-list
+                li Terms & Conditions
+                li Privacy Policy
+
+        .footer-bottom
+          p © 2025 Bikes SF. All rights reserved.
+
     script.
       function performSearch() {
         var input = document.getElementById('search');
@@ -167,44 +84,4 @@ html(lang="en")
         if (!query) return;
         window.location.href = '/search?q=' + encodeURIComponent(query);
       }
-
-    block content
-
-    .footer-parent
-      footer
-        .footer-main
-          .footer-brand
-            h1 Bikes SF
-          .learn-more
-            h2 Sell With Us
-            p Content about selling used parts with our website.
-            a.learn-more-link(href="/sell.html") Learn More →
-          .footer-links
-            .footer-column
-              h3 Resources
-              ul.footer-list
-                li Our Mission
-                li Careers
-                li Bike Safety
-                li Member Updates
-                li FAQ
-            .footer-column
-              h3 Get Involved
-              ul.footer-list
-                li Volunteer
-                li Donate
-                li Partnerships
-                li Events
-                li Community
-            .footer-column
-              h3 Legal
-              ul.footer-list
-                li Terms & Conditions
-                li Privacy Policy
-                li Cookie Policy
-                li Accessibility
-                li Careers
-
-        .footer-bottom
-          p © 2025 Bikes SF. All rights reserved. | Your one stop shop for used and new bike products in San Francisco.
 
