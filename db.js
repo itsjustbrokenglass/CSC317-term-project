@@ -259,14 +259,11 @@ module.exports = {
   removeFromCart,
   clearCart,
   getCartCount,
-  createOrderFromCart,   
+  createOrderFromCart,    
   getUserPurchaseHistory, 
   getUserSellingHistory,
   getAllListings
 };
-
-
-
 
 
 
