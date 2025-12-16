@@ -1,1 +1,116 @@
+extends layout
 
+block content
+  main.faq-page
+    .faq-container
+      h1 Frequently Asked Questions
+      p.faq-subtitle Everything you need to know about buying and selling on Bikes SF.
+
+      .faq-grid
+        //- Column 1: Buying
+        .faq-column
+          h2 🚲 Buying
+          
+          details.faq-item
+            summary How do I contact a seller?
+            p.faq-answer You can contact a seller by clicking the "Contact Seller" button on any product page. This will open an email draft to the seller directly.
+          
+          details.faq-item
+            summary Is it safe to buy used bikes?
+            p.faq-answer We recommend meeting in public places during daylight hours for all transactions. Test ride the bike before paying to ensure it matches the description.
+          
+          details.faq-item
+            summary What payment methods are accepted?
+            p.faq-answer Payments are handled directly between the buyer and seller (Cash, Venmo, Zelle) unless you use our secure checkout for shipping items.
+
+        //- Column 2: Selling
+        .faq-column
+          h2 🏷️ Selling
+          
+          details.faq-item
+            summary Is there a fee to list my bike?
+            p.faq-answer No! Listing on Bikes SF is currently 100% free for all local sellers.
+          
+          details.faq-item
+            summary How do I edit my listing?
+            p.faq-answer Go to your User Profile page and click "Edit" on the specific item you want to change.
+          
+          details.faq-item
+            summary How long does a listing stay active?
+            p.faq-answer Listings stay active for 30 days. You can renew them from your dashboard if your item hasn't sold yet.
+
+  style.
+    .faq-page {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+    
+    .faq-container h1 {
+      text-align: center;
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .faq-subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 18px;
+      margin-bottom: 60px;
+    }
+    
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+    
+    .faq-column h2 {
+      font-size: 24px;
+      border-bottom: 2px solid #222;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .faq-item {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .faq-item summary {
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 15px 0;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* Add a plus icon */
+    .faq-item summary::after {
+      content: '+';
+      font-size: 24px;
+      font-weight: 300;
+      color: #888;
+    }
+    
+    /* Change to minus when open */
+    .faq-item[open] summary::after {
+      content: '−';
+    }
+    
+    .faq-answer {
+      color: #555;
+      line-height: 1.6;
+      padding-bottom: 20px;
+      font-size: 16px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .faq-grid { grid-template-columns: 1fr; gap: 40px; }
+      .faq-container h1 { font-size: 32px; }
+    }
