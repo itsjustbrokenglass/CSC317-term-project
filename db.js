@@ -259,8 +259,8 @@ module.exports = {
   removeFromCart,
   clearCart,
   getCartCount,
-  createOrderFromCart,    // <--- THIS WAS MISSING
-  getUserPurchaseHistory, // <--- THIS WAS MISSING
+  createOrderFromCart,   
+  getUserPurchaseHistory, 
   getUserSellingHistory,
   getAllListings
 };
