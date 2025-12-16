@@ -67,6 +67,15 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/about', (req, res) => {
+  getCartCount(req.session.userId, (err, count) => {
+    res.render('about', {
+      pageTitle: 'About Us | Bikes SF',
+      cartCount: count || 0
+    });
+  });
+});
+
 app.get('/faq', (req, res) => {
   getCartCount(req.session.userId, (err, count) => {
     res.render('faq', {
