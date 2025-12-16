@@ -67,6 +67,15 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/faq', (req, res) => {
+  getCartCount(req.session.userId, (err, count) => {
+    res.render('faq', {
+      pageTitle: 'FAQ | Bikes SF',
+      cartCount: count || 0
+    });
+  });
+});
+
 // Profile page
 app.get('/profile', (req, res) => {
   const error = req.query.error || null;
@@ -332,7 +341,7 @@ app.get('/product/:id', (req, res) => {
     }
     
     getCartCount(req.session.userId, (err, count) => {
-      res.render('product', {
+      res.render('products', {  // <-- MERGE NOTE: Changed 'product' to 'products' to match your file name
         pageTitle: `${listing.name} | Bikes SF`,
         listing,
         cartCount: count || 0
@@ -516,24 +525,21 @@ app.get('/search', (req, res) => {
   db.all(sql, [wildcard, wildcard], (err, results) => {
     if (err) return res.status(500).send("Search error");
 
-    // 0 RESULTS → render the "no results" page like before
     if (!results || results.length === 0) {
       return getCartCount(req.session.userId, (err2, count) => {
         res.render('search-results', {
           pageTitle: `Search results for "${query}"`,
           query,
-          results: [],           // empty list, so template shows "no results"
+          results: [],
           cartCount: count || 0
         });
       });
     }
 
-    // 1 RESULT → go straight to product page
     if (results.length === 1) {
       return res.redirect('/product/' + results[0].id);
     }
 
-    // MULTIPLE RESULTS → try exact match by name
     const exactMatch = results.find(
       item => item.name.toLowerCase() === query.toLowerCase()
     );
@@ -541,13 +547,10 @@ app.get('/search', (req, res) => {
     if (exactMatch) {
       return res.redirect('/product/' + exactMatch.id);
     }
-
-    // Otherwise → just go to the first result
+    
     return res.redirect('/product/' + results[0].id);
   });
 });
-
-
 
 // Server start
 app.listen(PORT, () => {
