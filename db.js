@@ -239,6 +239,11 @@ function getUserSellingHistory(userId, callback) {
   db.all(sql, [userId], callback);
 }
 
+function getAllListings(callback) {
+  const sql = `SELECT * FROM listings ORDER BY createdAt DESC`;
+  db.all(sql, [], callback);
+}
+
 module.exports = {
   db,
   dbPath,
@@ -256,7 +261,8 @@ module.exports = {
   getCartCount,
   createOrderFromCart,    // <--- THIS WAS MISSING
   getUserPurchaseHistory, // <--- THIS WAS MISSING
-  getUserSellingHistory
+  getUserSellingHistory,
+  getAllListings
 };
 
 
